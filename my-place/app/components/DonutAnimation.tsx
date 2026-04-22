@@ -196,41 +196,12 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
   const pointerDownXRef = useRef(0);
   const pointerDownYRef = useRef(0);
   const hasMovedRef = useRef(false);
-  const [showHello, setShowHello] = useState(false);
-  const [typedHello, setTypedHello] = useState("");
-  const [typingComplete, setTypingComplete] = useState(false);
+  const [showIntroCta, setShowIntroCta] = useState(true);
   const [fadingOut, setFadingOut] = useState(false);
-  const setShowHelloRef = useRef(setShowHello);
-  const showHelloRef = useRef(false);
-  const helloIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const fadingOutRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
-  setShowHelloRef.current = setShowHello;
   const lastTimeRef = useRef<number | null>(null);
-
-  const HELLO_TYPING_STEPS = [".", "o.", "lo.", "llo.", "ello.", "hello."];
-  const HELLO_TYPING_INTERVAL_MS = 300;
-
-  useEffect(() => {
-    if (!showHello) return;
-    let step = 0;
-    setTypedHello(HELLO_TYPING_STEPS[0]);
-    const id = setInterval(() => {
-      step += 1;
-      if (step < HELLO_TYPING_STEPS.length) {
-        setTypedHello(HELLO_TYPING_STEPS[step]);
-      } else {
-        if (helloIntervalRef.current) clearInterval(helloIntervalRef.current);
-        helloIntervalRef.current = null;
-        setTypingComplete(true);
-      }
-    }, HELLO_TYPING_INTERVAL_MS);
-    helloIntervalRef.current = id;
-    return () => {
-      clearInterval(id);
-      helloIntervalRef.current = null;
-    };
-  }, [showHello]);
 
   const FADE_OUT_MS = 300;
   useEffect(() => {
@@ -307,8 +278,8 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
         }
         if (allDone) {
           convergeRef.current = false;
-          showHelloRef.current = true;
-          setShowHelloRef.current?.(true);
+          fadingOutRef.current = true;
+          setFadingOut(true);
           if (preRef.current) preRef.current.textContent = "";
         } else {
           const frame = particlesToFrame(particles);
@@ -332,15 +303,15 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
           }
         }
         if (allDone) {
-          showHelloRef.current = true;
-          setShowHelloRef.current?.(true);
+          fadingOutRef.current = true;
+          setFadingOut(true);
           if (preRef.current) preRef.current.textContent = "";
         } else {
           const frame = particlesToFrame(particles);
           const text = frame.map((row) => row.join("")).join("\n");
           if (preRef.current) preRef.current.textContent = text;
         }
-      } else if (!showHelloRef.current) {
+      } else if (!fadingOutRef.current) {
         const dt = lastTimeRef.current !== null ? now - lastTimeRef.current : TARGET_FRAME_MS;
         lastTimeRef.current = now;
         const scale = Math.min(dt / TARGET_FRAME_MS, 3);
@@ -360,7 +331,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
       } else {
         if (preRef.current) preRef.current.textContent = "";
       }
-      if (!showHelloRef.current) animationId = requestAnimationFrame(tick);
+      if (!fadingOutRef.current) animationId = requestAnimationFrame(tick);
     };
 
     animationId = requestAnimationFrame((now) => {
@@ -372,7 +343,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    if (showHelloRef.current) return;
+    if (fadingOutRef.current) return;
     if (hasStartedExplosionRef.current) return;
     hasMovedRef.current = false;
     pointerDownXRef.current = e.clientX;
@@ -390,7 +361,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
   };
   const onPointerUp = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    if (showHelloRef.current) return;
+    if (fadingOutRef.current) return;
     if (hasStartedExplosionRef.current) {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
       return;
@@ -401,6 +372,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
     }
     if (!hasMovedRef.current) {
       hasStartedExplosionRef.current = true;
+      setShowIntroCta(false);
       const frame = renderFrame(
         COLS,
         ROWS,
@@ -466,59 +438,12 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
         {"\n".repeat(ROWS)}
       </pre>
 
-      {!showHello && (
+      {showIntroCta && (
         <p className="absolute left-1/2 top-[75%] -translate-x-1/2 pointer-events-none font-mono text-xs sm:text-sm text-zinc-500 whitespace-nowrap text-center px-4">
           Welcome to Greg&apos;s Portfolio
           <br />
           Click to proceed!
         </p>
-      )}
-
-      {showHello && (
-        <div
-          className="absolute inset-0 font-sans cursor-pointer"
-          style={{ animation: "donutHelloFadeIn 1.2s ease-out forwards" }}
-          onClick={() => {
-            if (!typingComplete) {
-              if (helloIntervalRef.current) {
-                clearInterval(helloIntervalRef.current);
-                helloIntervalRef.current = null;
-              }
-              setTypedHello(HELLO_TYPING_STEPS[HELLO_TYPING_STEPS.length - 1]);
-              setTypingComplete(true);
-            } else {
-              setFadingOut(true);
-            }
-          }}
-          role="button"
-          aria-label={typingComplete ? "Continue to menu" : "Speed up"}
-        >
-          <div
-            className="absolute"
-            style={{ left: "50%", top: "50%", transform: "translateX(1ch) translateY(-0.3em)" }}
-          >
-            <span
-              className="inline-block font-medium text-white tracking-tight font-mono -translate-x-full"
-              style={{
-                fontSize: "clamp(0.5rem, min(100vw / 80, 150vh / 80), 2rem)",
-                fontFamily:
-                  "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace",
-              }}
-            >
-              {typedHello}
-            </span>
-          </div>
-          <p
-            className="absolute left-[60%] top-[30%] -translate-x-1/2 pointer-events-none font-mono text-xs sm:text-sm md:text-base text-zinc-500 text-right px-4 max-w-xs sm:max-w-md"
-            style={{
-              opacity: typingComplete ? 1 : 0,
-              transition: "opacity 0.4s ease-out",
-            }}
-          >
-            My name&apos;s Greg and welcome to my corner of the internet.
-          </p>
-      
-        </div>
       )}
 
     </div>
