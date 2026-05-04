@@ -97,3 +97,148 @@ body {
 .animate-experience-scale-in {
   animation: experienceScaleIn 0.2s ease-out forwards;
 }
+
+@keyframes settingsPanelIn {
+  from {
+    opacity: 0;
+    transform: translate(8px, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+.animate-settings-panel-in {
+  animation: settingsPanelIn 0.22s ease-out forwards;
+}
+
+@keyframes swipeFingersNatural {
+  0%, 8% {
+    transform: translateY(18px);
+    opacity: 1;
+  }
+  25%, 38% {
+    transform: translateY(-18px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-18px);
+    opacity: 1;
+  }
+  68%, 88% {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(18px);
+    opacity: 1;
+  }
+}
+
+@keyframes swipeFingersStandard {
+  0%, 8% {
+    transform: translateY(-18px);
+    opacity: 1;
+  }
+  25%, 38% {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(18px);
+    opacity: 1;
+  }
+  68%, 88% {
+    transform: translateY(-18px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-18px);
+    opacity: 1;
+  }
+}
+
+@keyframes swipeSinglePageNatural {
+  0%, 8% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  25%, 50% {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
+  68%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes swipeSinglePageStandard {
+  0%, 8% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  25%, 50% {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
+  68%, 100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes swipeTwoPageNatural {
+  0%, 8% {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+  25%, 50% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  68%, 100% {
+    transform: translateY(42px);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeTwoPageStandard {
+  0%, 8% {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+  25%, 50% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  68%, 100% {
+    transform: translateY(42px);
+    opacity: 0;
+  }
+}
+
+.animate-swipe-fingers-natural {
+  animation: swipeFingersNatural 3.4s ease-in-out infinite;
+}
+
+.animate-swipe-fingers-standard {
+  animation: swipeFingersStandard 3.4s ease-in-out infinite;
+}
+
+.animate-swipe-single-page-natural {
+  animation: swipeSinglePageNatural 3.4s ease-in-out infinite;
+}
+
+.animate-swipe-single-page-standard {
+  animation: swipeSinglePageStandard 3.4s ease-in-out infinite;
+}
+
+.animate-swipe-two-page-natural {
+  animation: swipeTwoPageNatural 3.4s ease-in-out infinite;
+}
+
+.animate-swipe-two-page-standard {
+  animation: swipeTwoPageStandard 3.4s ease-in-out infinite;
+}

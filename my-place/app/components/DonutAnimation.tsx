@@ -27,8 +27,27 @@ const EXPLODE_DURATION_FRAMES = 120;
 const CLICK_THRESHOLD = 6;
 const EXPLODE_HOLD_OFF_SCREEN_FRAMES = 70;
 const CONVERGE_LERP = 0.05;
-const REASSEMBLE_LERP = 0.06;
-const REASSEMBLE_DONE_THRESHOLD = 0.02;
+const MENU_HOLD_MS = 650;
+const LANDSCAPE_EXPLOSION_FILL = { width: 0.9, height: 0.65 };
+const PORTRAIT_EXPLOSION_FILL = { width: 0.78, height: 0.88 };
+
+const MENU_LINES = [
+  "Greg's site",
+  "",
+  "v About",
+  "",
+  "< Experience",
+  "",
+  "> Works",
+  "",
+  "^ Contact",
+];
+
+type TargetPoint = {
+  x: number;
+  y: number;
+  char: string;
+};
 
 
 function renderFrame(
@@ -177,7 +196,68 @@ function particlesToFrame(particles: Particle[]): string[][] {
   return frame;
 }
 
-export default function DonutAnimation({ onComplete }: { onComplete?: () => void } = {}) {
+function getMenuTargetPoints(): TargetPoint[] {
+  const points: TargetPoint[] = [];
+  const startY = Math.floor((ROWS - MENU_LINES.length) / 2);
+
+  MENU_LINES.forEach((line, lineIndex) => {
+    const startX = Math.floor((COLS - line.length) / 2);
+    for (let charIndex = 0; charIndex < line.length; charIndex++) {
+      const char = line[charIndex];
+      if (char === " ") continue;
+      points.push({
+        x: startX + charIndex,
+        y: startY + lineIndex,
+        char,
+      });
+    }
+  });
+
+  return points;
+}
+
+function assignMenuTargets(particles: Particle[]) {
+  const targets = getMenuTargetPoints();
+  if (targets.length === 0) return;
+
+  particles.forEach((particle, index) => {
+    const target = targets[index % targets.length];
+    particle.targetX = target.x;
+    particle.targetY = target.y;
+    particle.char = target.char;
+  });
+}
+
+function getCenteredBounds(widthCols: number, heightRows: number) {
+  const clampedWidth = Math.min(COLS, Math.max(2, widthCols));
+  const clampedHeight = Math.min(ROWS, Math.max(2, heightRows));
+  const centerX = COLS / 2;
+  const centerY = ROWS / 2;
+
+  return {
+    minX: centerX - clampedWidth / 2,
+    maxX: centerX + clampedWidth / 2 - 1,
+    minY: centerY - clampedHeight / 2,
+    maxY: centerY + clampedHeight / 2 - 1,
+  };
+}
+
+function getExplosionBounds(chPx = 8, emPx = 14) {
+  const isPortrait =
+    typeof window !== "undefined" && window.innerHeight > window.innerWidth;
+  const fill = isPortrait ? PORTRAIT_EXPLOSION_FILL : LANDSCAPE_EXPLOSION_FILL;
+
+  if (typeof window === "undefined") {
+    return getCenteredBounds(COLS * fill.width, ROWS * fill.height);
+  }
+
+  return getCenteredBounds(
+    (window.innerWidth * fill.width) / chPx,
+    (window.innerHeight * fill.height) / emPx,
+  );
+}
+
+export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => void } = {}) {
   const preRef = useRef<HTMLPreElement>(null);
   const ARef = useRef(0);
   const BRef = useRef(0);
@@ -187,28 +267,20 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
   const explodingRef = useRef(false);
   const hasStartedExplosionRef = useRef(false);
   const convergeRef = useRef(false);
-  const reassembleRef = useRef(false);
   const particlesRef = useRef<Particle[]>([]);
   const explodeFrameRef = useRef(0);
   const atEdgeSinceFrameRef = useRef<number | null>(null);
-  // Viewport-relative clamp bounds (in grid coords, can exceed [0,COLS/ROWS]).
-  const explodeBoundsRef = useRef({ minX: 0, maxX: COLS - 1, minY: ROWS * 0.1, maxY: ROWS * 0.9 - 1 });
+  // Viewport-relative clamp bounds in grid coords.
+  const explodeBoundsRef = useRef(getExplosionBounds());
   const pointerDownXRef = useRef(0);
   const pointerDownYRef = useRef(0);
   const hasMovedRef = useRef(false);
   const [showIntroCta, setShowIntroCta] = useState(true);
-  const [fadingOut, setFadingOut] = useState(false);
-  const fadingOutRef = useRef(false);
-  const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
+  const menuFormedRef = useRef(false);
+  const menuHoldTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const onMenuReadyRef = useRef(onMenuReady);
+  onMenuReadyRef.current = onMenuReady;
   const lastTimeRef = useRef<number | null>(null);
-
-  const FADE_OUT_MS = 300;
-  useEffect(() => {
-    if (!fadingOut) return;
-    const t = setTimeout(() => onCompleteRef.current?.(), FADE_OUT_MS);
-    return () => clearTimeout(t);
-  }, [fadingOut]);
 
   useEffect(() => {
     let animationId: number;
@@ -250,18 +322,11 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
         if ((allAtEdge && holdDone) || timeout) {
           explodingRef.current = false;
           atEdgeSinceFrameRef.current = null;
-          const centerX = COLS / 2;
-          const centerY = ROWS / 2;
-          for (const p of particlesRef.current) {
-            p.targetX = centerX;
-            p.targetY = centerY;
-          }
+          assignMenuTargets(particlesRef.current);
           convergeRef.current = true;
         }
       } else if (convergeRef.current) {
         const particles = particlesRef.current;
-        const centerX = COLS / 2;
-        const centerY = ROWS / 2;
         let allDone = true;
         for (const p of particles) {
           if (p.targetX === undefined || p.targetY === undefined) continue;
@@ -272,46 +337,25 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
             p.y += dy * CONVERGE_LERP;
             allDone = false;
           } else {
-            p.x = centerX;
-            p.y = centerY;
-          }
-        }
-        if (allDone) {
-          convergeRef.current = false;
-          fadingOutRef.current = true;
-          setFadingOut(true);
-          if (preRef.current) preRef.current.textContent = "";
-        } else {
-          const frame = particlesToFrame(particles);
-          const text = frame.map((row) => row.join("")).join("\n");
-          if (preRef.current) preRef.current.textContent = text;
-        }
-      } else if (reassembleRef.current) {
-        const particles = particlesRef.current;
-        let allDone = true;
-        for (const p of particles) {
-          if (p.targetX === undefined || p.targetY === undefined) continue;
-          const dx = p.targetX - p.x;
-          const dy = p.targetY - p.y;
-          if (Math.abs(dx) > 0.02 || Math.abs(dy) > 0.02) {
-            p.x += dx * REASSEMBLE_LERP;
-            p.y += dy * REASSEMBLE_LERP;
-            allDone = false;
-          } else {
             p.x = p.targetX;
             p.y = p.targetY;
           }
         }
         if (allDone) {
-          fadingOutRef.current = true;
-          setFadingOut(true);
-          if (preRef.current) preRef.current.textContent = "";
+          convergeRef.current = false;
+          menuFormedRef.current = true;
+          const frame = particlesToFrame(particles);
+          const text = frame.map((row) => row.join("")).join("\n");
+          if (preRef.current) preRef.current.textContent = text;
+          menuHoldTimeoutRef.current = setTimeout(() => {
+            onMenuReadyRef.current?.();
+          }, MENU_HOLD_MS);
         } else {
           const frame = particlesToFrame(particles);
           const text = frame.map((row) => row.join("")).join("\n");
           if (preRef.current) preRef.current.textContent = text;
         }
-      } else if (!fadingOutRef.current) {
+      } else if (!menuFormedRef.current) {
         const dt = lastTimeRef.current !== null ? now - lastTimeRef.current : TARGET_FRAME_MS;
         lastTimeRef.current = now;
         const scale = Math.min(dt / TARGET_FRAME_MS, 3);
@@ -331,19 +375,24 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
       } else {
         if (preRef.current) preRef.current.textContent = "";
       }
-      if (!fadingOutRef.current) animationId = requestAnimationFrame(tick);
+      if (!menuFormedRef.current) {
+        animationId = requestAnimationFrame(tick);
+      }
     };
 
     animationId = requestAnimationFrame((now) => {
       lastTimeRef.current = now;
       tick(now);
     });
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      if (menuHoldTimeoutRef.current) clearTimeout(menuHoldTimeoutRef.current);
+    };
   }, []);
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    if (fadingOutRef.current) return;
+    if (menuFormedRef.current) return;
     if (hasStartedExplosionRef.current) return;
     hasMovedRef.current = false;
     pointerDownXRef.current = e.clientX;
@@ -361,7 +410,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
   };
   const onPointerUp = (e: React.PointerEvent) => {
     if (e.button !== 0) return;
-    if (fadingOutRef.current) return;
+    if (menuFormedRef.current) return;
     if (hasStartedExplosionRef.current) {
       (e.target as HTMLElement).releasePointerCapture(e.pointerId);
       return;
@@ -401,8 +450,8 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
         document.body.removeChild(probe);
       }
 
-      // Keep clamp bounds at the grid edges so particles collide with the walls.
-      explodeBoundsRef.current = { minX: 0, maxX: COLS - 1, minY: ROWS * 0.1, maxY: ROWS * 0.8 - 1 };
+      // Size the explosion wall from viewport percentages, converted to grid coords.
+      explodeBoundsRef.current = getExplosionBounds(chPx, emPx);
 
       // Speed: fastest particle (grid corner) arrives in ~60 % of the timeout
       // budget, keeping wall-collision timing consistent across screen sizes.
@@ -421,7 +470,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center overflow-hidden bg-black touch-none transition-opacity duration-500 ${fadingOut ? "opacity-0" : "opacity-100"}`}
+      className="fixed inset-0 flex items-center justify-center overflow-hidden bg-black touch-none"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
@@ -430,7 +479,7 @@ export default function DonutAnimation({ onComplete }: { onComplete?: () => void
         ref={preRef}
         className="font-mono text-white leading-none tracking-tight select-none w-full h-full flex items-center justify-center pointer-events-none m-0"
         style={{
-          fontSize: "clamp(0.5rem, min(100vw / 80, 150vh / 80), 2rem)",
+          fontSize: "clamp(0.7rem, min(100vw / 80, 150vh / 80), 2rem)",
           fontFamily:
             "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace",
         }}

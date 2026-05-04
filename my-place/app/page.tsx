@@ -22,12 +22,29 @@ const SLIDE_EASING = "cubic-bezier(0.33, 1.1, 0.68, 1)";
 const SWIPE_THRESHOLD = 100;
 const WHEEL_RESET_MS = 150;
 const SWIPE_COOLDOWN_MS = 500;
+const INITIAL_SETTINGS_DELAY_MS = 100;
 
 type SwipeDirection = "left" | "right" | "up" | "down";
 
 const swipeCooldownRef = { current: 0 };
 
-function useSwipe(onSwipe: (direction: SwipeDirection) => void, enabled: boolean) {
+function getDefaultSwipePreference() {
+  if (typeof navigator === "undefined") return true;
+
+  const platform = navigator.platform.toLowerCase();
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isApplePlatform =
+    platform.includes("mac") ||
+    platform.includes("iphone") ||
+    platform.includes("ipad") ||
+    userAgent.includes("mac os") ||
+    userAgent.includes("iphone") ||
+    userAgent.includes("ipad");
+
+  return isApplePlatform;
+}
+
+function useSwipe(onSwipe: (direction: SwipeDirection) => void, enabled: boolean, naturalSwipe: boolean) {
   const wheelAccumRef = useRef({ x: 0, y: 0 });
   const wheelResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLElement | null>(null);
@@ -58,9 +75,9 @@ function useSwipe(onSwipe: (direction: SwipeDirection) => void, enabled: boolean
         wheelAccumRef.current = { x: 0, y: 0 };
         
         if (absX > absY) {
-          onSwipeRef.current(x > 0 ? "left" : "right");
+          onSwipeRef.current(x > 0 === naturalSwipe ? "left" : "right");
         } else {
-          onSwipeRef.current(y > 0 ? "up" : "down");
+          onSwipeRef.current(y > 0 === naturalSwipe ? "up" : "down");
         }
         return;
       }
@@ -75,25 +92,9 @@ function useSwipe(onSwipe: (direction: SwipeDirection) => void, enabled: boolean
       el.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
     };
-  }, [enabled]);
+  }, [enabled, naturalSwipe]);
 
   return containerRef;
-}
-
-function SiteHeader() {
-  return (
-    <div className="flex items-center gap-3">
-      <img
-        src="/Excalibur%20Logo%205.svg"
-        alt=""
-        className="h-8 w-8 shrink-0 object-contain invert"
-        aria-hidden
-      />
-      <span className="font-[family-name:var(--font-geist-sans)] text-lg font-medium text-white/90">
-        Greg&apos;s site
-      </span>
-    </div>
-  );
 }
 
 const chevronPath = "M12 8l-6 6 1.41 1.41L12 10.83l4.59 4.58L18 14z";
@@ -165,18 +166,21 @@ interface PanelProps {
   onBack: () => void;
   onSwipeBack: () => void;
   swipeBackDirection: SwipeDirection;
+  naturalSwipe: boolean;
+  onSwipe?: () => void;
   children: ReactNode;
   header?: ReactNode;
 }
 
-function Panel({ isActive, animation, onBack, onSwipeBack, swipeBackDirection, children, header }: PanelProps) {
+function Panel({ isActive, animation, onBack, onSwipeBack, swipeBackDirection, naturalSwipe, onSwipe, children, header }: PanelProps) {
   const handleSwipe = useCallback((direction: SwipeDirection) => {
+    onSwipe?.();
     if (direction === swipeBackDirection) {
       onSwipeBack();
     }
-  }, [swipeBackDirection, onSwipeBack]);
+  }, [swipeBackDirection, onSwipeBack, onSwipe]);
 
-  const containerRef = useSwipe(handleSwipe, isActive);
+  const containerRef = useSwipe(handleSwipe, isActive, naturalSwipe);
 
   return (
     <section
@@ -203,60 +207,61 @@ function Panel({ isActive, animation, onBack, onSwipeBack, swipeBackDirection, c
 interface MenuProps {
   isActive: boolean;
   onNavigate: (view: View) => void;
+  naturalSwipe: boolean;
+  onSwipe?: () => void;
 }
 
-function Menu({ isActive, onNavigate }: MenuProps) {
+function Menu({ isActive, onNavigate, naturalSwipe, onSwipe }: MenuProps) {
   const handleSwipe = useCallback((direction: SwipeDirection) => {
+    onSwipe?.();
     switch (direction) {
       case "left": onNavigate("works"); break;
       case "right": onNavigate("experience"); break;
       case "up": onNavigate("about"); break;
       case "down": onNavigate("contact"); break;
     }
-  }, [onNavigate]);
+  }, [onNavigate, onSwipe]);
 
-  const containerRef = useSwipe(handleSwipe, isActive);
+  const containerRef = useSwipe(handleSwipe, isActive, naturalSwipe);
 
   return (
     <section
       ref={containerRef}
-      className={`h-screen flex flex-col items-center justify-center absolute inset-0 transition-opacity duration-500 ${isActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+      className={`h-screen absolute inset-0 ${isActive ? "" : "pointer-events-none"}`}
     >
-      <div className="flex flex-col items-center gap-8">
-        <SiteHeader />
-        <nav className="flex flex-col gap-4 font-[family-name:var(--font-geist-sans)]" aria-label="Main menu">
+      <div
+        className="absolute left-1/2 top-1/2 h-[40em] w-[80ch] -translate-x-1/2 -translate-y-1/2 font-mono leading-none tracking-tight text-white"
+        style={{
+          fontSize: "clamp(0.7rem, min(100vw / 80, 150vh / 80), 2rem)",
+          fontFamily:
+            "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace",
+        }}
+      >
+        <nav aria-label="Main menu">
         <button
           type="button"
           onClick={() => onNavigate("about")}
-          className="text-xl font-light text-white/70 hover:text-white transition-colors bg-transparent border-none cursor-pointer text-left flex items-center gap-2"
-        >
-          <ChevronDown />
-          About
-        </button>
+          className="absolute left-[36ch] top-[17em] h-[1em] w-[7ch] cursor-pointer bg-transparent text-transparent focus-visible:outline-1 focus-visible:outline-white/60"
+          aria-label="About"
+        />
         <button
           type="button"
           onClick={() => onNavigate("experience")}
-          className="text-xl font-light text-white/70 hover:text-white transition-colors bg-transparent border-none cursor-pointer text-left flex items-center gap-2"
-        >
-          <ChevronLeft />
-          Experience
-        </button>
+          className="absolute left-[34ch] top-[19em] h-[1em] w-[12ch] cursor-pointer bg-transparent text-transparent focus-visible:outline-1 focus-visible:outline-white/60"
+          aria-label="Experience"
+        />
         <button
           type="button"
           onClick={() => onNavigate("works")}
-          className="text-xl font-light text-white/70 hover:text-white transition-colors bg-transparent border-none cursor-pointer text-left flex items-center gap-2"
-        >
-          <ChevronRight />
-          Works
-        </button>
+          className="absolute left-[36ch] top-[21em] h-[1em] w-[7ch] cursor-pointer bg-transparent text-transparent focus-visible:outline-1 focus-visible:outline-white/60"
+          aria-label="Works"
+        />
         <button
           type="button"
           onClick={() => onNavigate("contact")}
-          className="text-xl font-light text-white/70 hover:text-white transition-colors bg-transparent border-none cursor-pointer text-left flex items-center gap-2"
-        >
-          <ChevronUp />
-          Contact
-        </button>
+          className="absolute left-[35ch] top-[23em] h-[1em] w-[9ch] cursor-pointer bg-transparent text-transparent focus-visible:outline-1 focus-visible:outline-white/60"
+          aria-label="Contact"
+        />
       </nav>
       </div>
     </section>
@@ -273,6 +278,7 @@ function AboutContent() {
       <p className="mx-auto max-w-lg text-center text-white/70">
         I&apos;ve seen people put passwords on their personal sites and I kind of liked the exclusivity of it—but I don&apos;t care for the actual privateness. So my little entry into this site was just to have some fun. What better way to have fun than to explode a donut? I liked the exclusivity though, and wanted to pull you into my world and how I like to design.
       </p>
+     
     </div>
   );
 }
@@ -326,24 +332,183 @@ function WorksContent() {
   );
 }
 
+function ToggleSwitch({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative h-6 w-11 cursor-pointer rounded-2xl border border-white p-0.5 transition-colors duration-300 ${
+        checked ? "bg-white" : "bg-black"
+      }`}
+      aria-label={`${checked ? "Turn off" : "Turn on"} ${label}`}
+      aria-pressed={checked}
+    >
+      <span
+        className={`absolute top-0.5 h-5 w-5 rounded-full transition-all duration-300 ease-out ${
+          checked ? "left-[22px] bg-black" : "left-0.5 bg-white"
+        }`}
+      />
+    </button>
+  );
+}
+
+function NaturalSwipePreview({ naturalSwipe }: { naturalSwipe: boolean }) {
+  return (
+    <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-white/15 bg-black/30">
+        <div
+          className={`flex gap-2 ${
+            naturalSwipe ? "animate-swipe-fingers-natural" : "animate-swipe-fingers-standard"
+          }`}
+          aria-hidden
+        >
+          <span className="h-3 w-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" />
+          <span className="h-3 w-3 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.7)]" />
+        </div>
+      </div>
+
+      <div className="relative h-24 overflow-hidden rounded-md border border-white/15 bg-black/30">
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
+            naturalSwipe ? "animate-swipe-single-page-natural" : "animate-swipe-single-page-standard"
+          }`}
+          aria-hidden
+        >
+          <span className="h-1 w-24 rounded bg-white/80" />
+        </div>
+        <div
+          className={`absolute inset-0 flex flex-col items-center justify-center gap-2 ${
+            naturalSwipe ? "animate-swipe-two-page-natural" : "animate-swipe-two-page-standard"
+          }`}
+          aria-hidden
+        >
+          <span className="h-1 w-20 rounded bg-white/80" />
+          <span className="h-1 w-28 rounded bg-white/65" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsMenu({
+  naturalSwipe,
+  onNaturalSwipeChange,
+  isOpen,
+  onOpenChange,
+}: {
+  naturalSwipe: boolean;
+  onNaturalSwipeChange: (enabled: boolean) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        onOpenChange(false);
+      }
+    };
+    const onWheel = () => onOpenChange(false);
+
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("wheel", onWheel, { passive: true });
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("wheel", onWheel);
+    };
+  }, [isOpen, onOpenChange]);
+
+  return (
+    <div ref={containerRef} className="absolute right-4 top-4 z-50 font-mono">
+      <button
+        type="button"
+        onClick={() => onOpenChange(!isOpen)}
+        className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white/80 backdrop-blur transition-colors hover:border-white/40 hover:text-white"
+        aria-label="Open settings"
+        aria-expanded={isOpen}
+      >
+        <svg className="h-5 w-5 transition-transform duration-300 ease-out group-hover:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
+          <path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z" />
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.4 1.07V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 8.6 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1.07-.4H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 8.6a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .4-1.07V3a2 2 0 1 1 4 0v.09A1.65 1.65 0 0 0 15.4 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9c.14.35.37.65.6 1 .31.23.69.37 1.07.4H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51.6Z" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <div className="animate-settings-panel-in absolute right-12 top-12 w-64 rounded-lg border border-white/20 bg-black/85 p-4 text-sm text-white/80 shadow-2xl backdrop-blur">
+          <div className="relative flex items-center justify-between gap-4">
+            <span>Default swipe</span>
+            <ToggleSwitch
+              checked={naturalSwipe}
+              onChange={onNaturalSwipeChange}
+              label="default swipe"
+            />
+          </div>
+          <NaturalSwipePreview naturalSwipe={naturalSwipe} />
+          <p className="mt-3 text-xs leading-relaxed text-white/45">
+            Defaults on for Apple devices and off for Windows/Linux. Toggle if swipes feel inverted.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
-  const [animationDone, setAnimationDone] = useState(false);
+  const [menuReady, setMenuReady] = useState(false);
   const [view, setView] = useState<View>("menu");
+  const [naturalSwipe, setNaturalSwipe] = useState(getDefaultSwipePreference);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const goToMenu = () => setView("menu");
+  const closeSettings = useCallback(() => setSettingsOpen(false), []);
+
+  useEffect(() => {
+    return () => {
+      if (settingsDelayTimeoutRef.current) clearTimeout(settingsDelayTimeoutRef.current);
+    };
+  }, []);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-black text-white relative">
       {/* Donut animation */}
-      <div
-        className={`absolute inset-0 transition-opacity duration-500 ${animationDone ? "opacity-0 pointer-events-none" : "opacity-100"}`}
-      >
-        <DonutAnimation onComplete={() => setAnimationDone(true)} />
+      <div className="absolute inset-0">
+        <DonutAnimation
+          onMenuReady={() => {
+            setMenuReady(true);
+            settingsDelayTimeoutRef.current = setTimeout(() => {
+              setSettingsOpen(true);
+            }, INITIAL_SETTINGS_DELAY_MS);
+          }}
+        />
       </div>
 
+      <SettingsMenu
+        naturalSwipe={naturalSwipe}
+        onNaturalSwipeChange={setNaturalSwipe}
+        isOpen={settingsOpen}
+        onOpenChange={setSettingsOpen}
+      />
+
       {/* Main content */}
-      <div className={`absolute inset-0 transition-opacity duration-1000 ${animationDone ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-        <Menu isActive={view === "menu"} onNavigate={setView} />
+      <div className={`absolute inset-0 ${menuReady ? "" : "pointer-events-none"}`}>
+        <Menu
+          isActive={menuReady && view === "menu"}
+          onNavigate={setView}
+          naturalSwipe={naturalSwipe}
+          onSwipe={closeSettings}
+        />
 
         <Panel
           isActive={view === "about"}
@@ -351,6 +516,8 @@ export default function Home() {
           onBack={goToMenu}
           onSwipeBack={goToMenu}
           swipeBackDirection="down"
+          naturalSwipe={naturalSwipe}
+          onSwipe={closeSettings}
         >
           <AboutContent />
         </Panel>
@@ -361,6 +528,8 @@ export default function Home() {
           onBack={goToMenu}
           onSwipeBack={goToMenu}
           swipeBackDirection="left"
+          naturalSwipe={naturalSwipe}
+          onSwipe={closeSettings}
         >
           <ExperienceContent />
         </Panel>
@@ -371,6 +540,8 @@ export default function Home() {
           onBack={goToMenu}
           onSwipeBack={goToMenu}
           swipeBackDirection="up"
+          naturalSwipe={naturalSwipe}
+          onSwipe={closeSettings}
         >
           <ContactContent />
         </Panel>
@@ -381,6 +552,8 @@ export default function Home() {
           onBack={goToMenu}
           onSwipeBack={goToMenu}
           swipeBackDirection="right"
+          naturalSwipe={naturalSwipe}
+          onSwipe={closeSettings}
         >
           <WorksContent />
         </Panel>
