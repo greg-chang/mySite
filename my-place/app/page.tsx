@@ -268,17 +268,142 @@ function Menu({ isActive, onNavigate, naturalSwipe, onSwipe }: MenuProps) {
   );
 }
 
+function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pauseMs = 1600) {
+  const [displayed, setDisplayed] = useState("");
+  const [wordIndex, setWordIndex] = useState(0);
+  const [phase, setPhase] = useState<"typing" | "pausing" | "deleting">("typing");
+
+  useEffect(() => {
+    const word = words[wordIndex % words.length];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (phase === "typing") {
+      if (displayed.length < word.length) {
+        timeout = setTimeout(() => setDisplayed(word.slice(0, displayed.length + 1)), typingSpeed);
+      } else {
+        timeout = setTimeout(() => setPhase("pausing"), pauseMs);
+      }
+    } else if (phase === "pausing") {
+      timeout = setTimeout(() => setPhase("deleting"), 0);
+    } else {
+      if (displayed.length > 0) {
+        timeout = setTimeout(() => setDisplayed(displayed.slice(0, -1)), deletingSpeed);
+      } else {
+        setWordIndex((i) => i + 1);
+        setPhase("typing");
+      }
+    }
+
+    return () => clearTimeout(timeout);
+  }, [displayed, phase, wordIndex, words, typingSpeed, deletingSpeed, pauseMs]);
+
+  return displayed;
+}
+
+const TYPEWRITER_WORDS = [
+  "candid",
+  "curious",
+  "always exploring",
+  "a climber",
+  "a skater",
+  "a parkour practitioner",
+  "a reader",
+  "a people person",
+  "a trampolinist",
+  "a bad tennis player",
+];
+
 function AboutContent() {
+  const typed = useTypewriter(TYPEWRITER_WORDS);
+
+  const books = [
+    { title: "Creativity Inc", author: "Ed Catmull" },
+    { title: "The Fifth Discipline", author: "Peter Senge" },
+    { title: "On Earth We're Briefly Gorgeous", author: "Ocean Vuong" },
+  ];
+
+  const sports = [
+    "Parkour / Freerunning / Tricking",
+    "Trampolining",
+    "Skateboarding",
+    "Climbing",
+    "Tennis",
+    "Badminton",
+    "Ping Pong",
+  ];
+
   return (
-    <div className="flex flex-1 flex-col overflow-auto px-6 pb-6 pt-14 font-sans font-light md:px-10 md:pb-10 md:pt-16">
-      <div className="mb-12 flex items-start justify-between gap-4 md:mb-16">
+    <div className="flex flex-1 flex-col overflow-auto px-6 pb-16 pt-14 font-sans font-light md:px-10 md:pb-20 md:pt-16">
+      <div className="mb-16 flex items-start justify-between gap-4 md:mb-20">
         <h1 className="min-w-0 flex-1 text-4xl font-light text-white md:text-5xl lg:text-6xl">About</h1>
         <BackToMenuButton />
       </div>
-      <p className="mx-auto max-w-lg text-center text-white/70">
-        I&apos;ve seen people put passwords on their personal sites and I kind of liked the exclusivity of it—but I don&apos;t care for the actual privateness. So my little entry into this site was just to have some fun. What better way to have fun than to explode a donut? I liked the exclusivity though, and wanted to pull you into my world and how I like to design.
-      </p>
-     
+
+      {/* Typewriter hero */}
+      <div className="mb-16 md:mb-24">
+        <p className="mb-2 text-xs uppercase tracking-widest text-white/25">I am</p>
+        <p className="min-h-[3.5rem] text-4xl font-light text-white md:text-5xl lg:text-6xl">
+          {typed}
+          <span className="ml-1 inline-block w-[2px] animate-[blink_1s_step-end_infinite] bg-white align-middle leading-none">&nbsp;</span>
+        </p>
+      </div>
+
+      <hr className="mb-16 border-white/8 md:mb-20" />
+
+      {/* Values */}
+      <section className="mb-16 md:mb-20">
+        <p className="mb-10 text-xs uppercase tracking-widest text-white/25">Values</p>
+        <div className="space-y-10">
+          {[
+            {
+              n: "01",
+              title: "Candidness",
+              body: "Ed Catmull wrote about this in Creativity Inc — a candid environment lets people express more, generate better ideas, and genuinely enjoy each other’s company. In every setting I’ve been in, how willing people were to be candid with one another always determined how successful and enjoyable working together actually was. I try to create spaces where people feel safe to speak their mind, share mistakes, and say the hard things.",
+            },
+            {
+              n: "02",
+              title: "Curiosity",
+              body: "I love picking up new skills, going to new places, and hearing about other people’s experiences. I want to experience as much as possible while I’m here — both the bad and the good. Understanding the worlds we live in and the worlds we build is something I find endlessly fascinating.",
+            },
+          ].map(({ n, title, body }) => (
+            <div key={n} className="flex gap-6 md:gap-10">
+              <span className="shrink-0 pt-0.5 font-mono text-xs text-white/20">{n}</span>
+              <div>
+                <p className="mb-3 text-base text-white">{title}</p>
+                <p className="max-w-prose text-sm leading-relaxed text-white/55">{body}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <hr className="mb-16 border-white/8 md:mb-20" />
+
+      {/* Books */}
+      <section className="mb-16 md:mb-20">
+        <p className="mb-8 text-xs uppercase tracking-widest text-white/25">Reading</p>
+        <ul>
+          {books.map((b) => (
+            <li
+              key={b.title}
+              className="flex items-baseline justify-between gap-6 border-b border-white/6 py-4 first:border-t"
+            >
+              <span className="text-sm text-white">{b.title}</span>
+              <span className="shrink-0 text-xs text-white/35">{b.author}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <hr className="mb-16 border-white/8 md:mb-20" />
+
+      {/* Movement */}
+      <section>
+        <p className="mb-6 text-xs uppercase tracking-widest text-white/25">Movement</p>
+        <p className="text-sm leading-loose text-white/55">
+          {sports.join(" · ")}
+        </p>
+      </section>
     </div>
   );
 }
