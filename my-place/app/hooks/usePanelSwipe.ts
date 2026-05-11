@@ -28,6 +28,20 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     const onWheel = (e: WheelEvent) => {
       if (Date.now() < swipeCooldownRef.current) return;
 
+      // If a scrollable child still has room to scroll in this direction, let it.
+      if (e.deltaY !== 0) {
+        let node: Element | null = e.target as Element;
+        while (node && node !== el) {
+          const { overflowY } = window.getComputedStyle(node);
+          if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
+            if (e.deltaY < 0 && node.scrollTop > 0) return;
+            if (e.deltaY > 0 && node.scrollTop < node.scrollHeight - node.clientHeight - 1) return;
+            break;
+          }
+          node = node.parentElement;
+        }
+      }
+
       if (wheelResetTimeoutRef.current) {
         clearTimeout(wheelResetTimeoutRef.current);
       }

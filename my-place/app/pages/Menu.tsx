@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import type { View } from "../../types/site";
-import { useSwipe, type SwipeDirection } from "../../hooks/usePanelSwipe";
+import type { View } from "../types/site";
+import { useSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
 
 export interface MenuProps {
   isActive: boolean;

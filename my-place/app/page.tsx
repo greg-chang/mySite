@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import DonutAnimation from "./components/DonutAnimation";
-import { Menu } from "./components/site/Menu";
-import { Panel } from "./components/site/Panel";
-import { AboutContent, ContactContent, ExperienceContent, WorksContent } from "./components/site/PanelContents";
-import { SettingsMenu } from "./components/site/SettingsMenu";
+import { Menu } from "./pages/Menu";
+import { Panel } from "./pages/Panel";
+import { AboutContent, ContactContent, ExperienceContent, WorksContent } from "./pages/PanelContents";
+import { SettingsMenu } from "./pages/SettingsMenu";
 import { INITIAL_SETTINGS_DELAY_MS } from "./constants/siteUi";
 import { getDefaultSwipePreference } from "./lib/getDefaultSwipePreference";
 import type { View } from "./types/site";

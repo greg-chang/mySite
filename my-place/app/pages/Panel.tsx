@@ -6,9 +6,9 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { SLIDE_DURATION, SLIDE_BACK_DURATION_MS, SLIDE_EASING } from "../../constants/siteAnimations";
-import { useSwipe, type SwipeDirection } from "../../hooks/usePanelSwipe";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "./SiteChevrons";
+import { SLIDE_DURATION, SLIDE_BACK_DURATION_MS, SLIDE_EASING } from "../constants/siteAnimations";
+import { useSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
+import { LuChevronDown, LuChevronLeft, LuChevronRight, LuChevronUp } from "react-icons/lu";
 
 export const PanelNavContext = createContext<{
   onBack: () => void;
@@ -26,13 +26,13 @@ export function usePanelNav() {
 function chevronForSwipeBack(direction: SwipeDirection) {
   switch (direction) {
     case "down":
-      return <ChevronUp />;
+      return <LuChevronUp />;
     case "up":
-      return <ChevronDown />;
+      return <LuChevronDown />;
     case "left":
-      return <ChevronRight />;
+      return <LuChevronRight />;
     case "right":
-      return <ChevronLeft />;
+      return <LuChevronLeft />;
   }
 }
 
