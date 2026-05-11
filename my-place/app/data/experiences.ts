@@ -11,7 +11,7 @@ export type ExperienceEntry = {
 export const experiences: ExperienceEntry[] = [
   {
     id: "1",
-    title: "Software Engineer Mentor",
+    title: "Student Assistant (Hackathon Lead)",
     description:
       "Led hackathon to teach prototyping, design, and coding to 50 students & created data report analyzing 370+ MESA students",
     period: "Oct '24 - Aug '25",
@@ -29,7 +29,7 @@ export const experiences: ExperienceEntry[] = [
       "Managed product development for UC Davis student exclusive ride-sharing website for 1100+ users",
     period: "Jul '24 - Sep '24",
     image: "/experiences/aggieworks.png",
-    url: "https://aggieworks.org/",
+    url: "https://aggieworks.org/products/moober",
     details: [
       "Scaled a student-exclusive ridesharing app from 200 to 1,100+ users while leading a cross-functional team of engineers, designers, and marketing.",
       "Led 40+ user interviews, analyzed SQL data, and shipped improvements around maps, notifications, security, and ride requests, improving NPS by 16%.",
@@ -70,7 +70,7 @@ export const experiences: ExperienceEntry[] = [
       "Developed flashcard website that integrated space reptition to improve learning efficiency",
     period: "Oct '23 - Jun '24",
     image: "/experiences/codelablogo.png",
-    url: "https://www.codelabdavis.com/",
+    url: "https://codelabdavis.medium.com/interactive-learning-tool-espresso-551f1263925d",
     details: [
       "Built a flashcard learning experience focused on spaced repetition and study efficiency.",
       "Collaborated in a student software team environment to ship product features and iterate on user feedback.",
