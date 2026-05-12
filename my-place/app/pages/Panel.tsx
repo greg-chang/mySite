@@ -6,8 +6,11 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { SLIDE_DURATION, SLIDE_BACK_DURATION_MS, SLIDE_EASING } from "../constants/siteAnimations";
 import { useSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
+
+const SLIDE_DURATION = "0.42s";
+const SLIDE_BACK_DURATION_MS = 500;
+const SLIDE_EASING = "cubic-bezier(0.33, 1.1, 0.68, 1)";
 import { LuChevronDown, LuChevronLeft, LuChevronRight, LuChevronUp } from "react-icons/lu";
 
 export const PanelNavContext = createContext<{

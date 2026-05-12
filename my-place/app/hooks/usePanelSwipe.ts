@@ -1,12 +1,11 @@
 import { useRef, useEffect } from "react";
-import {
-  SWIPE_COOLDOWN_MS,
-  SWIPE_THRESHOLD,
-  WHEEL_RESET_MS,
-  PROJECT_SWIPE_LOCK_MS,
-} from "../constants/siteSwipe";
 
 export type SwipeDirection = "left" | "right" | "up" | "down";
+
+const SWIPE_COOLDOWN_MS = 500;
+const SWIPE_THRESHOLD = 100;
+const WHEEL_RESET_MS = 150;
+const PROJECT_SWIPE_LOCK_MS = 900;
 
 const swipeCooldownRef = { current: 0 };
 
@@ -81,6 +80,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   return containerRef;
 }
 
+// used in WorksContent.tsx for the vertical swipe handling & swipe back functionality
 export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
   onSwipe: (direction: Extract<SwipeDirection, "up" | "down">) => void,
   enabled: boolean,

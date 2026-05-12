@@ -6,8 +6,9 @@ import { Menu } from "./pages/Menu";
 import { Panel } from "./pages/Panel";
 import { AboutContent, ContactContent, ExperienceContent, WorksContent } from "./pages/PanelContents";
 import { SettingsMenu } from "./pages/SettingsMenu";
-import { INITIAL_SETTINGS_DELAY_MS } from "./constants/siteUi";
 import { getDefaultSwipePreference } from "./lib/getDefaultSwipePreference";
+
+const INITIAL_SETTINGS_DELAY_MS = 100;
 import type { View } from "./types/site";
 
 export default function Home() {

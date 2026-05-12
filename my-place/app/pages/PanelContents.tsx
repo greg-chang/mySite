@@ -40,16 +40,15 @@ function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pa
 }
 
 const TYPEWRITER_WORDS = [
-  "candid",
   "curious",
   "always exploring",
   "a climber",
   "a skater",
-  "a parkour practitioner",
+  "at the parkour gym ... most likely",
   "a reader",
   "a people person",
-  "a trampolinist",
-  "a bad tennis player",
+  "a observationalist?",
+  "also a bad tennis player",
 ];
 
 export function AboutContent() {
