@@ -41,14 +41,15 @@ function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pa
 
 const TYPEWRITER_WORDS = [
   "curious",
-  "always exploring",
-  "a climber",
-  "a skater",
-  "at the parkour gym ... most likely",
-  "a reader",
-  "a people person",
-  "a observationalist?",
+  "a nature lover",
+  "a fan of Jazz",
+  "likely at the parkour gym",
   "also a bad tennis player",
+  "a software developer",
+  "a designer",
+  "a product manager",  
+  "figuring it out",
+  "",
 ];
 
 export function AboutContent() {
@@ -103,13 +104,18 @@ export function AboutContent() {
               {[
                 {
                   n: "01",
-                  title: "Candidness",
+                  title: "Candor",
                   body: "Ed Catmull wrote about this in Creativity Inc — a candid environment lets people express more, generate better ideas, and genuinely enjoy each other's company. In every setting I've been in, how willing people were to be candid with one another always determined how successful and enjoyable working together actually was. I try to create spaces where people feel safe to speak their mind, share mistakes, and say the hard things.",
                 },
                 {
                   n: "02",
                   title: "Curiosity",
                   body: "I love picking up new skills, going to new places, and hearing about other people's experiences. I want to experience as much as possible while I'm here — both the bad and the good. Understanding the worlds we live in and the worlds we build is something I find endlessly fascinating.",
+                },
+                {
+                  n: "03",
+                  title: "Humility",
+                  body: "I try to be humble in my approach to life and work. I try to be open to learning from others and to be willing to admit when I'm wrong. I try to be willing to listen to others and to be willing to learn from them.",
                 },
               ].map(({ n, title, body }) => (
                 <div key={n} className="flex gap-6 md:gap-10">

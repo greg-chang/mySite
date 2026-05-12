@@ -6,8 +6,12 @@ const SWIPE_COOLDOWN_MS = 500;
 const SWIPE_THRESHOLD = 100;
 const WHEEL_RESET_MS = 150;
 const PROJECT_SWIPE_LOCK_MS = 900;
+/** After a horizontal/vertical panel nav swipe, swallow wheel momentum so one gesture can't chain (e.g. Experience → Menu → Works). */
+const PANEL_GESTURE_LOCK_MS = 500;
 
 const swipeCooldownRef = { current: 0 };
+/** Survives panel ↔ menu remounts so Firefox wheel momentum can't chain a second nav on the newly active surface. */
+const panelNavMomentumLockUntilRef = { current: 0 };
 
 export function useSwipe<T extends HTMLElement = HTMLElement>(
   onSwipe: (direction: SwipeDirection) => void,
@@ -21,16 +25,37 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   onSwipeRef.current = onSwipe;
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el || !enabled) return;
+    if (!enabled) {
+      wheelAccumRef.current = { x: 0, y: 0 };
+      if (wheelResetTimeoutRef.current) {
+        clearTimeout(wheelResetTimeoutRef.current);
+        wheelResetTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    wheelAccumRef.current = { x: 0, y: 0 };
+    if (wheelResetTimeoutRef.current) {
+      clearTimeout(wheelResetTimeoutRef.current);
+      wheelResetTimeoutRef.current = null;
+    }
+    // Intentionally do not reset swipeCooldownRef on enable — see panelNavMomentumLockUntilRef above.
 
     const onWheel = (e: WheelEvent) => {
+      const el = containerRef.current;
+      if (!el || !(e.target instanceof Node) || !el.contains(e.target)) return;
+
+      if (Date.now() < panelNavMomentumLockUntilRef.current) {
+        e.preventDefault();
+        return;
+      }
+
       if (Date.now() < swipeCooldownRef.current) return;
 
-      // If a scrollable child still has room to scroll in this direction, let it.
+      // If a scrollable element still has room to scroll in this direction, let it.
       if (e.deltaY !== 0) {
         let node: Element | null = e.target as Element;
-        while (node && node !== el) {
+        while (node) {
           const { overflowY } = window.getComputedStyle(node);
           if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
             if (e.deltaY < 0 && node.scrollTop > 0) return;
@@ -55,6 +80,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       if (absX >= SWIPE_THRESHOLD || absY >= SWIPE_THRESHOLD) {
         e.preventDefault();
         swipeCooldownRef.current = Date.now() + SWIPE_COOLDOWN_MS;
+        panelNavMomentumLockUntilRef.current = Date.now() + PANEL_GESTURE_LOCK_MS;
         wheelAccumRef.current = { x: 0, y: 0 };
 
         if (absX > absY) {
@@ -70,9 +96,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }, WHEEL_RESET_MS);
     };
 
-    el.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("wheel", onWheel, { passive: false });
     return () => {
-      el.removeEventListener("wheel", onWheel);
+      window.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
     };
   }, [enabled, naturalSwipe]);
@@ -80,7 +106,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   return containerRef;
 }
 
-// used in WorksContent.tsx for the vertical swipe handling & swipe back functionality
+/** Vertical project carousel: stays on the Works container so vertical swipes can stopPropagation before bubbling to the panel section. Horizontal wheels still propagate to panel swipe-back (see useSwipe). */
 export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
   onSwipe: (direction: Extract<SwipeDirection, "up" | "down">) => void,
   enabled: boolean,
@@ -95,10 +121,41 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
   onSwipeRef.current = onSwipe;
 
   useEffect(() => {
+    if (!enabled) {
+      wheelAccumRef.current = { x: 0, y: 0 };
+      gestureLockedRef.current = false;
+      if (wheelResetTimeoutRef.current) {
+        clearTimeout(wheelResetTimeoutRef.current);
+        wheelResetTimeoutRef.current = null;
+      }
+      if (gestureLockTimeoutRef.current) {
+        clearTimeout(gestureLockTimeoutRef.current);
+        gestureLockTimeoutRef.current = null;
+      }
+      return;
+    }
+
+    wheelAccumRef.current = { x: 0, y: 0 };
+    gestureLockedRef.current = false;
+    if (wheelResetTimeoutRef.current) {
+      clearTimeout(wheelResetTimeoutRef.current);
+      wheelResetTimeoutRef.current = null;
+    }
+    if (gestureLockTimeoutRef.current) {
+      clearTimeout(gestureLockTimeoutRef.current);
+      gestureLockTimeoutRef.current = null;
+    }
+
     const el = containerRef.current;
-    if (!el || !enabled) return;
+    if (!el) return;
 
     const onWheel = (e: WheelEvent) => {
+      if (Date.now() < panelNavMomentumLockUntilRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+
       if (wheelResetTimeoutRef.current) {
         clearTimeout(wheelResetTimeoutRef.current);
       }
