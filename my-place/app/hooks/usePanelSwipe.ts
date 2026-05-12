@@ -21,15 +21,16 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   onSwipeRef.current = onSwipe;
 
   useEffect(() => {
-    if (!enabled) return;
+    const el = containerRef.current;
+    if (!el || !enabled) return;
 
     const onWheel = (e: WheelEvent) => {
       if (Date.now() < swipeCooldownRef.current) return;
 
-      // If a scrollable element still has room to scroll in this direction, let it.
+      // If a scrollable child still has room to scroll in this direction, let it.
       if (e.deltaY !== 0) {
         let node: Element | null = e.target as Element;
-        while (node) {
+        while (node && node !== el) {
           const { overflowY } = window.getComputedStyle(node);
           if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
             if (e.deltaY < 0 && node.scrollTop > 0) return;
@@ -69,9 +70,9 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }, WHEEL_RESET_MS);
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
-      window.removeEventListener("wheel", onWheel);
+      el.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
     };
   }, [enabled, naturalSwipe]);
@@ -94,7 +95,8 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
   onSwipeRef.current = onSwipe;
 
   useEffect(() => {
-    if (!enabled) return;
+    const el = containerRef.current;
+    if (!el || !enabled) return;
 
     const onWheel = (e: WheelEvent) => {
       if (wheelResetTimeoutRef.current) {
@@ -141,9 +143,9 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
       }
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("wheel", onWheel, { passive: false });
     return () => {
-      window.removeEventListener("wheel", onWheel);
+      el.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
       if (gestureLockTimeoutRef.current) clearTimeout(gestureLockTimeoutRef.current);
     };
