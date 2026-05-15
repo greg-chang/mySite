@@ -7,12 +7,14 @@ import { useVerticalSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
 import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 import { BackToMenuButton } from "./Panel";
 
-function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pauseMs = 1600) {
+function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pauseMs = 1600, enabled = true) {
   const [displayed, setDisplayed] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [phase, setPhase] = useState<"typing" | "pausing" | "deleting">("typing");
 
   useEffect(() => {
+    if (!enabled) return;
+
     const word = words[wordIndex % words.length];
     let timeout: ReturnType<typeof setTimeout>;
 
@@ -34,7 +36,7 @@ function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pa
     }
 
     return () => clearTimeout(timeout);
-  }, [displayed, phase, wordIndex, words, typingSpeed, deletingSpeed, pauseMs]);
+  }, [enabled, displayed, phase, wordIndex, words, typingSpeed, deletingSpeed, pauseMs]);
 
   return displayed;
 }
@@ -52,8 +54,8 @@ const TYPEWRITER_WORDS = [
   "",
 ];
 
-export function AboutContent() {
-  const typed = useTypewriter(TYPEWRITER_WORDS);
+export function AboutContent({ isActive }: { isActive: boolean }) {
+  const typed = useTypewriter(TYPEWRITER_WORDS, 80, 45, 1600, isActive);
 
   const books = [
     { title: "Creativity Inc", author: "Ed Catmull" },
@@ -238,7 +240,7 @@ export function ContactContent() {
   );
 }
 
-export function WorksContent({ naturalSwipe }: { naturalSwipe: boolean }) {
+export function WorksContent({ naturalSwipe, isActive }: { naturalSwipe: boolean; isActive: boolean }) {
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
   const [projectSlideDirection, setProjectSlideDirection] = useState<"up" | "down">("down");
   const activeProject = projects[activeProjectIndex];
@@ -259,7 +261,7 @@ export function WorksContent({ naturalSwipe }: { naturalSwipe: boolean }) {
       setActiveProjectIndex((index) => (index + 1) % projects.length);
     }
   }, []);
-  const worksSwipeRef = useVerticalSwipe<HTMLDivElement>(handleProjectSwipe, true, naturalSwipe);
+  const worksSwipeRef = useVerticalSwipe<HTMLDivElement>(handleProjectSwipe, isActive, naturalSwipe);
 
   return (
     <div

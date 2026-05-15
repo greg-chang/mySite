@@ -489,7 +489,7 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
 
       {showIntroCta && (
         <p className="absolute left-1/2 top-[75%] -translate-x-1/2 pointer-events-none font-mono text-xs sm:text-sm text-zinc-500 whitespace-nowrap text-center px-4">
-          Welcome to Greg&apos;s Portfolio
+          You put everything on the bagel ...
           <br />
           Click to proceed!
         </p>
