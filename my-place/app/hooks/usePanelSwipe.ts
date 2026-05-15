@@ -42,13 +42,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     // Intentionally do not reset swipeCooldownRef on enable — see panelNavMomentumLockUntilRef above.
 
     const onWheel = (e: WheelEvent) => {
-      const el = containerRef.current;
-      if (!el || !(e.target instanceof Node) || !el.contains(e.target)) return;
-
-      if (Date.now() < panelNavMomentumLockUntilRef.current) {
-        e.preventDefault();
-        return;
-      }
+      if (Date.now() < panelNavMomentumLockUntilRef.current) return;
 
       if (Date.now() < swipeCooldownRef.current) return;
 
@@ -78,7 +72,6 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       const absY = Math.abs(y);
 
       if (absX >= SWIPE_THRESHOLD || absY >= SWIPE_THRESHOLD) {
-        e.preventDefault();
         swipeCooldownRef.current = Date.now() + SWIPE_COOLDOWN_MS;
         panelNavMomentumLockUntilRef.current = Date.now() + PANEL_GESTURE_LOCK_MS;
         wheelAccumRef.current = { x: 0, y: 0 };
@@ -96,7 +89,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }, WHEEL_RESET_MS);
     };
 
-    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("wheel", onWheel, { passive: true });
     return () => {
       window.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
@@ -151,7 +144,6 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
 
     const onWheel = (e: WheelEvent) => {
       if (Date.now() < panelNavMomentumLockUntilRef.current) {
-        e.preventDefault();
         e.stopPropagation();
         return;
       }
@@ -165,7 +157,6 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
       }, WHEEL_RESET_MS);
 
       if (gestureLockedRef.current) {
-        e.preventDefault();
         e.stopPropagation();
         return;
       }
@@ -188,7 +179,6 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
           return;
         }
 
-        e.preventDefault();
         e.stopPropagation();
         swipeCooldownRef.current = Date.now() + SWIPE_COOLDOWN_MS;
         gestureLockedRef.current = true;
@@ -200,7 +190,7 @@ export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
       }
     };
 
-    el.addEventListener("wheel", onWheel, { passive: false });
+    el.addEventListener("wheel", onWheel, { passive: true });
     return () => {
       el.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);

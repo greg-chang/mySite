@@ -42,14 +42,14 @@ function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pa
 }
 
 const TYPEWRITER_WORDS = [
-  "curious",
-  "a nature lover",
+  "seeking new adventures",
+  "curious!",
+  "a coffee addict",
   "a fan of Jazz",
+  "always open for a chat",
   "likely at the parkour gym",
   "also a bad tennis player",
-  "a software developer",
-  "a designer",
-  "a product manager",  
+  "looking for free climbing gym guest passes",
   "figuring it out",
   "",
 ];
@@ -90,7 +90,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
 
           {/* Typewriter hero */}
           <div className="mb-10 md:mb-14">
-            <p className="mb-2 text-sm font-normal uppercase tracking-[0.35em] text-white/45">I am</p>
+            <p className="mb-2 text-sm font-normal uppercase tracking-[0.35em] text-white/45">I'm</p>
             <p className="min-h-14 text-5xl font-light text-white md:text-6xl lg:text-7xl">
               {typed}
               <span className="ml-1 inline-block w-[2px] animate-[blink_1s_step-end_infinite] bg-white align-middle leading-none">&nbsp;</span>
