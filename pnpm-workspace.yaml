@@ -1,6 +1,5 @@
 packages:
-  - '.'
-
+  - "my-place"
 
 ignoredBuiltDependencies:
   - sharp

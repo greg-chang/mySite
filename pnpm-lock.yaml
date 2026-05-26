@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  my-place:
     dependencies:
       next:
         specifier: 16.1.6
