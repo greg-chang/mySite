@@ -29,11 +29,13 @@ export const metadata: Metadata = {
     siteName: "Greg Chang",
     locale: "en_US",
     type: "website",
+    images: [{ url: "https://greg-chang.com/Logo.svg", alt: "Greg Chang" }],
   },
   twitter: {
     card: "summary",
     title: "Greg Chang",
     description: "Greg Chang — curious builder, open to new adventures.",
+    images: ["https://greg-chang.com/Logo.svg"],
   },
 };
 
