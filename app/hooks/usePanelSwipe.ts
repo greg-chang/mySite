@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 export type SwipeDirection = "left" | "right" | "up" | "down";
 
 const SWIPE_THRESHOLD = 50;
+const TOUCH_THRESHOLD = 60; // slightly higher than wheel — touch deltas are in physical px
 const WHEEL_RESET_MS = 150;
 const PROJECT_SWIPE_LOCK_MS = 900;
 
@@ -120,9 +121,70 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       }, WHEEL_RESET_MS);
     };
 
+    // --- Touch support ---
+    // Touch is always direct — no naturalSwipe flip (there's no "inverted touch" on phones).
+    // We snapshot the scrollable-parent state at touchstart so the check at touchend
+    // sees the original scroll position, not the post-scroll one.
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchScrollSnap: { scrollTop: number; scrollHeight: number; clientHeight: number } | null = null;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (!enabledRef.current) return;
+      if (e.touches.length !== 1) return;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+
+      // Snapshot the nearest scrollable parent so we can check scroll boundaries at touchend.
+      touchScrollSnap = null;
+      let node: Element | null = e.target as Element;
+      while (node) {
+        const { overflowY } = window.getComputedStyle(node);
+        if ((overflowY === "auto" || overflowY === "scroll") && node.scrollHeight > node.clientHeight) {
+          touchScrollSnap = {
+            scrollTop: node.scrollTop,
+            scrollHeight: node.scrollHeight,
+            clientHeight: node.clientHeight,
+          };
+          break;
+        }
+        node = node.parentElement;
+      }
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      if (!enabledRef.current) return;
+      if (e.changedTouches.length !== 1) return;
+
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      const absX = Math.abs(dx);
+      const absY = Math.abs(dy);
+
+      if (absX < TOUCH_THRESHOLD && absY < TOUCH_THRESHOLD) return;
+
+      // If the gesture was primarily vertical and a scrollable parent had room to
+      // scroll in that direction, treat it as a content scroll, not a page swipe.
+      if (absY > absX && touchScrollSnap) {
+        const { scrollTop, scrollHeight, clientHeight } = touchScrollSnap;
+        if (dy > 0 && scrollTop > 0) return; // finger down = content scrolling up, still had room
+        if (dy < 0 && scrollTop < scrollHeight - clientHeight - 1) return; // finger up = scrolling down
+      }
+
+      if (absX > absY) {
+        onSwipeRef.current(dx > 0 ? "right" : "left");
+      } else {
+        onSwipeRef.current(dy > 0 ? "down" : "up");
+      }
+    };
+
     window.addEventListener("wheel", onWheel, { passive: true });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
     return () => {
       window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
