@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: "/Logo.svg",
+  },
   title: "Greg Chang",
   description: "Greg Chang — curious builder, open to new adventures. Personal portfolio with experience, projects, and contact.",
   keywords: ["Greg Chang", "Greg", "portfolio", "software engineer", "product"],
