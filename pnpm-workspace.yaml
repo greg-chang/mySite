@@ -1,6 +1,0 @@
-packages:
-  - "my-place"
-
-ignoredBuiltDependencies:
-  - sharp
-  - unrs-resolver
