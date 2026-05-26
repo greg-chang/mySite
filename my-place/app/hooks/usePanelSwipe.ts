@@ -2,16 +2,33 @@ import { useRef, useEffect } from "react";
 
 export type SwipeDirection = "left" | "right" | "up" | "down";
 
-const SWIPE_COOLDOWN_MS = 500;
-const SWIPE_THRESHOLD = 100;
+const SWIPE_THRESHOLD = 50;
 const WHEEL_RESET_MS = 150;
 const PROJECT_SWIPE_LOCK_MS = 900;
-/** After a horizontal/vertical panel nav swipe, swallow wheel momentum so one gesture can't chain (e.g. Experience → Menu → Works). */
-const PANEL_GESTURE_LOCK_MS = 500;
 
-const swipeCooldownRef = { current: 0 };
-/** Survives panel ↔ menu remounts so Firefox wheel momentum can't chain a second nav on the newly active surface. */
-const panelNavMomentumLockUntilRef = { current: 0 };
+/**
+ * Directional momentum lock — no time-based cooldowns.
+ *
+ * After a panel-nav swipe, same-axis same-sign events are treated as momentum
+ * and ignored.  The lock clears when:
+ *   a) delta falls below MOMENTUM_DEAD_PX  (momentum decayed)
+ *   b) sign reverses                        (user deliberately reversed)
+ *   c) WHEEL_RESET_MS passes with no events (mouse wheel / quick lift)
+ *
+ * Opposite-direction swipes are NEVER blocked.
+ */
+const MOMENTUM_DEAD_PX = 2;
+
+const navLockRef = { current: null as { axis: "x" | "y"; sign: number } | null };
+const navLockClearTimer = { current: null as ReturnType<typeof setTimeout> | null };
+
+function clearNavLock() {
+  navLockRef.current = null;
+  if (navLockClearTimer.current) {
+    clearTimeout(navLockClearTimer.current);
+    navLockClearTimer.current = null;
+  }
+}
 
 export function useSwipe<T extends HTMLElement = HTMLElement>(
   onSwipe: (direction: SwipeDirection) => void,
@@ -21,32 +38,45 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   const wheelAccumRef = useRef({ x: 0, y: 0 });
   const wheelResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<T | null>(null);
+
+  // Sync refs on every render — the listener reads these instead of closing
+  // over stale prop values.  This also means the listener never needs to be
+  // re-registered when enabled/naturalSwipe change, eliminating the ~16 ms
+  // gap that previously occurred during panel transitions.
+  const enabledRef = useRef(enabled);
+  const naturalSwipeRef = useRef(naturalSwipe);
   const onSwipeRef = useRef(onSwipe);
+  enabledRef.current = enabled;
+  naturalSwipeRef.current = naturalSwipe;
   onSwipeRef.current = onSwipe;
 
+  // Reset accumulator whenever enabled changes (no listener remount needed).
   useEffect(() => {
-    if (!enabled) {
-      wheelAccumRef.current = { x: 0, y: 0 };
-      if (wheelResetTimeoutRef.current) {
-        clearTimeout(wheelResetTimeoutRef.current);
-        wheelResetTimeoutRef.current = null;
-      }
-      return;
-    }
-
     wheelAccumRef.current = { x: 0, y: 0 };
     if (wheelResetTimeoutRef.current) {
       clearTimeout(wheelResetTimeoutRef.current);
       wheelResetTimeoutRef.current = null;
     }
-    // Intentionally do not reset swipeCooldownRef on enable — see panelNavMomentumLockUntilRef above.
+  }, [enabled]);
 
+  // Mount once — never remounts.
+  useEffect(() => {
     const onWheel = (e: WheelEvent) => {
-      if (Date.now() < panelNavMomentumLockUntilRef.current) return;
+      if (!enabledRef.current) return;
 
-      if (Date.now() < swipeCooldownRef.current) return;
+      // Directional momentum guard.
+      const lock = navLockRef.current;
+      if (lock) {
+        const delta = lock.axis === "x" ? e.deltaX : e.deltaY;
+        if (Math.sign(delta) === lock.sign && Math.abs(delta) >= MOMENTUM_DEAD_PX) {
+          if (navLockClearTimer.current) clearTimeout(navLockClearTimer.current);
+          navLockClearTimer.current = setTimeout(clearNavLock, WHEEL_RESET_MS);
+          return;
+        }
+        clearNavLock();
+      }
 
-      // If a scrollable element still has room to scroll in this direction, let it.
+      // Let scrollable children scroll before treating the gesture as a page swipe.
       if (e.deltaY !== 0) {
         let node: Element | null = e.target as Element;
         while (node) {
@@ -60,9 +90,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
         }
       }
 
-      if (wheelResetTimeoutRef.current) {
-        clearTimeout(wheelResetTimeoutRef.current);
-      }
+      if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
 
       wheelAccumRef.current.x += e.deltaX;
       wheelAccumRef.current.y += e.deltaY;
@@ -72,15 +100,18 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       const absY = Math.abs(y);
 
       if (absX >= SWIPE_THRESHOLD || absY >= SWIPE_THRESHOLD) {
-        swipeCooldownRef.current = Date.now() + SWIPE_COOLDOWN_MS;
-        panelNavMomentumLockUntilRef.current = Date.now() + PANEL_GESTURE_LOCK_MS;
         wheelAccumRef.current = { x: 0, y: 0 };
 
         if (absX > absY) {
-          onSwipeRef.current(x > 0 === naturalSwipe ? "left" : "right");
+          navLockRef.current = { axis: "x", sign: Math.sign(x) };
+          onSwipeRef.current(x > 0 === naturalSwipeRef.current ? "left" : "right");
         } else {
-          onSwipeRef.current(y > 0 === naturalSwipe ? "up" : "down");
+          navLockRef.current = { axis: "y", sign: Math.sign(y) };
+          onSwipeRef.current(y > 0 === naturalSwipeRef.current ? "up" : "down");
         }
+
+        if (navLockClearTimer.current) clearTimeout(navLockClearTimer.current);
+        navLockClearTimer.current = setTimeout(clearNavLock, WHEEL_RESET_MS);
         return;
       }
 
@@ -94,109 +125,87 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
       window.removeEventListener("wheel", onWheel);
       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
     };
-  }, [enabled, naturalSwipe]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return containerRef;
 }
 
-/** Vertical project carousel: stays on the Works container so vertical swipes can stopPropagation before bubbling to the panel section. Horizontal wheels still propagate to panel swipe-back (see useSwipe). */
-export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
-  onSwipe: (direction: Extract<SwipeDirection, "up" | "down">) => void,
-  enabled: boolean,
-  naturalSwipe: boolean,
-) {
-  const wheelAccumRef = useRef({ x: 0, y: 0 });
-  const wheelResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const gestureLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const gestureLockedRef = useRef(false);
-  const containerRef = useRef<T | null>(null);
-  const onSwipeRef = useRef(onSwipe);
-  onSwipeRef.current = onSwipe;
+// /** Vertical project carousel inside the Works panel. */
+// export function useVerticalSwipe<T extends HTMLElement = HTMLElement>(
+//   onSwipe: (direction: Extract<SwipeDirection, "up" | "down">) => void,
+//   enabled: boolean,
+//   naturalSwipe: boolean,
+// ) {
+//   const wheelAccumRef = useRef({ x: 0, y: 0 });
+//   const wheelResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+//   const gestureLockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+//   const gestureLockedRef = useRef(false);
+//   const containerRef = useRef<T | null>(null);
+//   const enabledRef = useRef(enabled);
+//   const naturalSwipeRef = useRef(naturalSwipe);
+//   const onSwipeRef = useRef(onSwipe);
+//   enabledRef.current = enabled;
+//   naturalSwipeRef.current = naturalSwipe;
+//   onSwipeRef.current = onSwipe;
 
-  useEffect(() => {
-    if (!enabled) {
-      wheelAccumRef.current = { x: 0, y: 0 };
-      gestureLockedRef.current = false;
-      if (wheelResetTimeoutRef.current) {
-        clearTimeout(wheelResetTimeoutRef.current);
-        wheelResetTimeoutRef.current = null;
-      }
-      if (gestureLockTimeoutRef.current) {
-        clearTimeout(gestureLockTimeoutRef.current);
-        gestureLockTimeoutRef.current = null;
-      }
-      return;
-    }
+//   useEffect(() => {
+//     wheelAccumRef.current = { x: 0, y: 0 };
+//     gestureLockedRef.current = false;
+//     if (wheelResetTimeoutRef.current) {
+//       clearTimeout(wheelResetTimeoutRef.current);
+//       wheelResetTimeoutRef.current = null;
+//     }
+//     if (gestureLockTimeoutRef.current) {
+//       clearTimeout(gestureLockTimeoutRef.current);
+//       gestureLockTimeoutRef.current = null;
+//     }
+//   }, [enabled]);
 
-    wheelAccumRef.current = { x: 0, y: 0 };
-    gestureLockedRef.current = false;
-    if (wheelResetTimeoutRef.current) {
-      clearTimeout(wheelResetTimeoutRef.current);
-      wheelResetTimeoutRef.current = null;
-    }
-    if (gestureLockTimeoutRef.current) {
-      clearTimeout(gestureLockTimeoutRef.current);
-      gestureLockTimeoutRef.current = null;
-    }
+//   useEffect(() => {
+//     const el = containerRef.current;
+//     if (!el) return;
 
-    const el = containerRef.current;
-    if (!el) return;
+//     const onWheel = (e: WheelEvent) => {
+//       if (!enabledRef.current) return;
 
-    const onWheel = (e: WheelEvent) => {
-      if (Date.now() < panelNavMomentumLockUntilRef.current) {
-        e.stopPropagation();
-        return;
-      }
+//       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
+//       wheelResetTimeoutRef.current = setTimeout(() => {
+//         wheelAccumRef.current = { x: 0, y: 0 };
+//       }, WHEEL_RESET_MS);
 
-      if (wheelResetTimeoutRef.current) {
-        clearTimeout(wheelResetTimeoutRef.current);
-      }
+//       if (gestureLockedRef.current) {
+//         e.stopPropagation();
+//         return;
+//       }
 
-      wheelResetTimeoutRef.current = setTimeout(() => {
-        wheelAccumRef.current = { x: 0, y: 0 };
-      }, WHEEL_RESET_MS);
+//       wheelAccumRef.current.x += e.deltaX;
+//       wheelAccumRef.current.y += e.deltaY;
 
-      if (gestureLockedRef.current) {
-        e.stopPropagation();
-        return;
-      }
+//       const { x, y } = wheelAccumRef.current;
+//       const absX = Math.abs(x);
+//       const absY = Math.abs(y);
 
-      if (Date.now() < swipeCooldownRef.current) {
-        return;
-      }
+//       if (absX >= SWIPE_THRESHOLD || absY >= SWIPE_THRESHOLD) {
+//         wheelAccumRef.current = { x: 0, y: 0 };
+//         if (absX > absY) return; // horizontal-dominant: let useSwipe handle panel nav
 
-      wheelAccumRef.current.x += e.deltaX;
-      wheelAccumRef.current.y += e.deltaY;
+//         e.stopPropagation();
+//         gestureLockedRef.current = true;
+//         if (gestureLockTimeoutRef.current) clearTimeout(gestureLockTimeoutRef.current);
+//         gestureLockTimeoutRef.current = setTimeout(() => {
+//           gestureLockedRef.current = false;
+//         }, PROJECT_SWIPE_LOCK_MS);
+//         onSwipeRef.current(y > 0 === naturalSwipeRef.current ? "up" : "down");
+//       }
+//     };
 
-      const { x, y } = wheelAccumRef.current;
-      const absX = Math.abs(x);
-      const absY = Math.abs(y);
+//     el.addEventListener("wheel", onWheel, { passive: true });
+//     return () => {
+//       el.removeEventListener("wheel", onWheel);
+//       if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
+//       if (gestureLockTimeoutRef.current) clearTimeout(gestureLockTimeoutRef.current);
+//     };
+//   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-      if (absX >= SWIPE_THRESHOLD || absY >= SWIPE_THRESHOLD) {
-        wheelAccumRef.current = { x: 0, y: 0 };
-
-        if (absX > absY) {
-          return;
-        }
-
-        e.stopPropagation();
-        swipeCooldownRef.current = Date.now() + SWIPE_COOLDOWN_MS;
-        gestureLockedRef.current = true;
-        if (gestureLockTimeoutRef.current) clearTimeout(gestureLockTimeoutRef.current);
-        gestureLockTimeoutRef.current = setTimeout(() => {
-          gestureLockedRef.current = false;
-        }, PROJECT_SWIPE_LOCK_MS);
-        onSwipeRef.current(y > 0 === naturalSwipe ? "up" : "down");
-      }
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: true });
-    return () => {
-      el.removeEventListener("wheel", onWheel);
-      if (wheelResetTimeoutRef.current) clearTimeout(wheelResetTimeoutRef.current);
-      if (gestureLockTimeoutRef.current) clearTimeout(gestureLockTimeoutRef.current);
-    };
-  }, [enabled, naturalSwipe]);
-
-  return containerRef;
-}
+//   return containerRef;
+// }

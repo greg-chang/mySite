@@ -5,27 +5,28 @@ export type Project = {
   /** Path under `public/` (e.g. `/photo.jpg`) or configured remote URL */
   imageSrc?: string;
   imageAlt: string;
+  url?: string;
+  imageClassName?: string;
 };
 
 export const projects: Project[] = [
   {
-    id: "sample-1",
-    title: "Sample project",
-    description: "Replace with your own summary, stack, or role.",
-    imageSrc: "/next.svg",
-    imageAlt: "Sample project preview",
+    id: "moober",
+    title: "Moober",
+    description:
+      "Moober is a carpooling and uber/lyft splitting platform for UC Davis students to save money and gas",
+    imageSrc: "/projects/MooberLogo.svg",
+    imageAlt: "Moober project preview",
+    imageClassName: "h-40 w-40 md:h-56 md:w-56 [image-rendering:pixelated]",
+    url: "https://mooberdavis.com/",
   },
   {
-    id: "sample-2",
-    title: "Another piece of work",
-    description: "Add as many entries as you need in this list.",
-    imageSrc: "/globe.svg",
-    imageAlt: "Another project preview",
-  },
-  {
-    id: "placeholder",
-    title: "Image coming soon",
-    description: "Omit imageSrc to show the placeholder state until you have an asset.",
-    imageAlt: "",
+    id: "espresso",
+    title: "Espresso",
+    description:
+      "Espresso combines the usability of Quizlet and the space repetition algorithm from Anki",
+    imageSrc: "/projects/Espresso-project.png",
+    imageAlt: "Espresso project preview",
+    url: "https://codelabdavis.medium.com/interactive-learning-tool-espresso-551f1263925d",
   },
 ];

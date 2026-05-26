@@ -1,11 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Experience } from "../components/Experience";
 import { projects } from "../data/projects";
-import { useVerticalSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
-import { LuChevronDown, LuChevronUp } from "react-icons/lu";
-import { BackToMenuButton } from "./Panel";
+import { PanelHeader } from "../components/PanelHeader";
 
 function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pauseMs = 1600, enabled = true) {
   const [displayed, setDisplayed] = useState("");
@@ -76,12 +74,8 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
 
-      {/* Transparent floating header */}
-      <div className="absolute left-0 right-0 top-0 z-10 flex items-start justify-between gap-4 px-6 pb-10 pt-14 backdrop-blur-sm mask-[linear-gradient(to_bottom,black_60%,transparent)] md:px-10 md:pt-16">
-        <h1 className="min-w-0 flex-1 text-4xl font-light text-white md:text-5xl lg:text-6xl">About</h1>
-        <BackToMenuButton />
-      </div>
-
+      <PanelHeader title="About" />
+    
       {/* Body: content left, image right — scroll together under header */}
       <div className="flex flex-1 overflow-auto">
 
@@ -177,10 +171,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
 export function ExperienceContent() {
   return (
     <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light">
-      <div className="absolute left-0 right-0 top-0 z-10 flex items-start justify-between gap-4 px-6 pb-10 pt-14 backdrop-blur-sm mask-[linear-gradient(to_bottom,black_60%,transparent)] md:px-10 md:pt-16">
-        <h1 className="min-w-0 flex-1 text-4xl font-light text-white md:text-5xl lg:text-6xl">Experiences</h1>
-        <BackToMenuButton />
-      </div>
+      <PanelHeader title="Experiences" />
       <div className="flex flex-1 overflow-auto px-6 pb-6 pt-36 md:px-10 md:pb-10 md:pt-44">
         <div className="flex w-full flex-col">
           <Experience />
@@ -193,10 +184,7 @@ export function ExperienceContent() {
 export function ContactContent() {
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
-      <div className="absolute left-0 right-0 top-0 z-10 flex items-start justify-between gap-4 px-6 pb-10 pt-14 backdrop-blur-sm mask-[linear-gradient(to_bottom,black_60%,transparent)] md:px-10 md:pt-16">
-        <h1 className="min-w-0 flex-1 text-4xl font-light text-white md:text-5xl lg:text-6xl">Contact</h1>
-        <BackToMenuButton />
-      </div>
+      <PanelHeader title="Contact" />
       <div className="absolute left-1/2 top-1/2  z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-start gap-4 border border-white p-4 text-white/70">
         <img
           src="/Pictures/GregHead.png"
@@ -240,91 +228,71 @@ export function ContactContent() {
   );
 }
 
-export function WorksContent({ naturalSwipe, isActive }: { naturalSwipe: boolean; isActive: boolean }) {
-  const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-  const [projectSlideDirection, setProjectSlideDirection] = useState<"up" | "down">("down");
-  const activeProject = projects[activeProjectIndex];
-  const goToPreviousProject = () => {
-    setProjectSlideDirection("up");
-    setActiveProjectIndex((index) => (index - 1 + projects.length) % projects.length);
-  };
-  const goToNextProject = () => {
-    setProjectSlideDirection("down");
-    setActiveProjectIndex((index) => (index + 1) % projects.length);
-  };
-  const handleProjectSwipe = useCallback((direction: Extract<SwipeDirection, "up" | "down">) => {
-    if (direction === "up") {
-      setProjectSlideDirection("up");
-      setActiveProjectIndex((index) => (index - 1 + projects.length) % projects.length);
-    } else if (direction === "down") {
-      setProjectSlideDirection("down");
-      setActiveProjectIndex((index) => (index + 1) % projects.length);
-    }
-  }, []);
-  const worksSwipeRef = useVerticalSwipe<HTMLDivElement>(handleProjectSwipe, isActive, naturalSwipe);
-
+export function WorksContent() {
   return (
-    <div
-      ref={worksSwipeRef}
-      className="relative flex flex-1 flex-col overflow-hidden font-sans font-light"
-    >
-      <div className="absolute left-0 right-0 top-0 z-10 flex items-start justify-between gap-4 px-6 pb-10 pt-14 backdrop-blur-sm mask-[linear-gradient(to_bottom,black_60%,transparent)] md:px-10 md:pt-16">
-        <h1 className="min-w-0 flex-1 text-4xl font-light text-white md:text-5xl lg:text-6xl">Works</h1>
-        <BackToMenuButton />
-      </div>
+    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
+      <PanelHeader title="Works" />
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-start gap-4 px-6 pb-6 pt-28 md:px-10 md:pb-10 md:pt-32">
-        <button
-          type="button"
-          onClick={goToPreviousProject}
-          className="flex h-12 w-20 items-center justify-center text-white/50 transition-colors hover:text-white [&_svg]:h-9 [&_svg]:w-9"
-          aria-label="Previous project"
-        >
-          <LuChevronUp />
-        </button>
+      <div className="flex flex-1 overflow-auto px-6 md:px-10">
+        <div className="mx-auto flex w-full max-w-5xl min-h-full flex-col">
+          <div className="shrink-0 h-32 md:h-40" aria-hidden />
+          <div className="flex flex-1 flex-col justify-center gap-10 pb-16 md:gap-14 md:pb-20 lg:gap-16">
+          {projects.map((project, index) => {
+            const imageLeft = index % 2 === 0;
 
-        <section className="relative w-full border border-white bg-black">
-          <div className="border-b border-white brightness-50 px-4 py-2 font-mono text-xs uppercase tracking-[0.25em] text-white/50">
-            {activeProjectIndex + 1}/{projects.length}
+            return (
+              <article
+                key={project.id}
+                className="grid items-center gap-8 md:grid-cols-2 md:gap-2 lg:gap-16"
+              >
+                <div
+                  className={`flex min-h-[180px] items-center justify-center md:min-h-[220px] ${
+                    imageLeft ? "md:order-1" : "md:order-2"
+                  }`}
+                >
+                  {project.imageSrc ? (
+                    <img
+                      src={project.imageSrc}
+                      alt={project.imageAlt || project.title}
+                      className={
+                        project.imageClassName ??
+                        "max-h-64 max-w-md rounded-lg object-contain md:max-h-80"
+                      }
+                    />
+                  ) : (
+                    <span className="font-mono text-sm uppercase tracking-[0.2em] text-white/40">
+                      No image
+                    </span>
+                  )}
+                </div>
+
+                <div
+                  className={`flex flex-col justify-center ${
+                    imageLeft ? "md:order-2" : "md:order-1"
+                  }`}
+                >
+                  <h2 className="text-3xl font-light uppercase text-white md:text-4xl lg:text-5xl">
+                    {project.title}
+                  </h2>
+                  <p className="mt-5 max-w-md text-base font-light leading-relaxed text-white/65 md:mt-6 md:text-lg">
+                    {project.description}
+                  </p>
+                  {project.url && (
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-5 inline-block text-sm text-white/90 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white md:mt-6"
+                    >
+                      Visit site
+                    </a>
+                  )}
+                </div>
+              </article>
+            );
+          })}
           </div>
-
-          <div
-            key={activeProject.id}
-            className={`grid md:grid-cols-[1.35fr_0.9fr] ${
-              projectSlideDirection === "down"
-                ? "animate-works-project-slide-from-bottom"
-                : "animate-works-project-slide-from-top"
-            }`}
-          >
-            <div className="relative flex min-h-[50vh] items-center justify-center border-b border-white bg-white/5 md:border-b-0 md:border-r">
-              {activeProject.imageSrc ? (
-                <img
-                  src={activeProject.imageSrc}
-                  alt={activeProject.imageAlt || activeProject.title}
-                  className="max-h-56 max-w-[70%] object-contain grayscale invert"
-                />
-              ) : (
-                <span className="font-mono text-sm uppercase tracking-[0.2em] text-white/40">No image</span>
-              )}
-            </div>
-
-            <div className="p-6 md:p-8">
-              <h2 className="text-3xl font-light uppercase text-white md:text-5xl">{activeProject.title}</h2>
-              <p className="mt-6 max-w-md text-base font-light leading-relaxed text-white/65 md:text-lg">
-                {activeProject.description}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <button
-          type="button"
-          onClick={goToNextProject}
-          className="flex h-12 w-20 items-center justify-center text-white/50 transition-colors hover:text-white [&_svg]:h-9 [&_svg]:w-9"
-          aria-label="Next project"
-        >
-          <LuChevronDown />
-        </button>
+        </div>
       </div>
     </div>
   );

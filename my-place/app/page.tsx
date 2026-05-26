@@ -95,7 +95,7 @@ export default function Home() {
           naturalSwipe={naturalSwipe}
           onSwipe={closeSettings}
         >
-          <WorksContent naturalSwipe={naturalSwipe} isActive={view === "works"} />
+          <WorksContent />
         </Panel>
       </div>
     </div>
