@@ -16,16 +16,28 @@ export function Experience() {
 
   useLayoutEffect(() => {
     if (!activeExperienceId) return;
-
     const el = sectionRefs.current[activeExperienceId];
     if (!el) return;
 
+    // Walk up to find the panel's scroll container — stop before reaching the document
+    let scrollParent: HTMLElement | null = el.parentElement;
+    while (scrollParent) {
+      const { overflowY } = window.getComputedStyle(scrollParent);
+      if (overflowY === "auto" || overflowY === "scroll") break;
+      scrollParent = scrollParent.parentElement;
+    }
+    if (!scrollParent) return;
+
     const frame = requestAnimationFrame(() => {
-      el.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "nearest",
-      });
+      const containerRect = scrollParent!.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      const target =
+        scrollParent!.scrollTop +
+        elRect.top -
+        containerRect.top -
+        containerRect.height / 2 +
+        elRect.height / 2;
+      scrollParent!.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
     });
 
     return () => cancelAnimationFrame(frame);
@@ -38,12 +50,7 @@ export function Experience() {
 
         return (
           <div key={exp.id} className={`${rowClassName} mb-10 last:mb-0`}>
-            <div
-              ref={(el) => {
-                sectionRefs.current[exp.id] = el;
-              }}
-              className={scrollTargetClassName}
-            >
+            <div ref={(el) => { sectionRefs.current[exp.id] = el; }} className={scrollTargetClassName}>
               <button
                 type="button"
                 className="block w-full cursor-pointer bg-transparent p-0 text-left"
@@ -64,7 +71,7 @@ export function Experience() {
               </button>
 
               {isActive && exp.details && (
-                <div className="mt-5 max-w-2xl rounded-lg border border-white/15 bg-white/6 p-4 text-sm font-light text-white/75 shadow-2xl backdrop-blur md:ml-6 md:text-base">
+                <div className="mt-5 max-w-2xl rounded-lg border border-white/15 bg-white/6 p-4 text-sm font-light text-white/75 md:ml-6 md:text-base">
                   <ul className="space-y-2">
                     {exp.details.map((detail) => (
                       <li key={detail} className="leading-relaxed">
