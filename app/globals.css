@@ -3,13 +3,6 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --panel-slide-duration: 0.42s;
-}
-
-@media (pointer: coarse) {
-  :root {
-    --panel-slide-duration: 0.5s;
-  }
 }
 
 @theme inline {
@@ -29,6 +22,7 @@
 html {
   height: 100%;
   color-scheme: dark;
+  overscroll-behavior: none;
 }
 
 body {
@@ -37,6 +31,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   height: 100%;
+  overscroll-behavior: none;
 }
 
 /* Hide scrollbars; scrolling still works (wheel, trackpad, touch, keyboard) */

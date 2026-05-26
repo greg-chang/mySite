@@ -33,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-black text-white relative">
+    <div className="h-screen w-full overflow-hidden bg-black text-white relative" style={{ height: "100dvh" }}>
       <div className="absolute inset-0">
         <DonutAnimation
           onMenuReady={() => {

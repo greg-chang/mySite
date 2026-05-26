@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Experience } from "../components/Experience";
 import { projects } from "../data/projects";
 import { PanelHeader } from "../components/PanelHeader";
@@ -54,6 +54,11 @@ const TYPEWRITER_WORDS = [
 
 export function AboutContent({ isActive }: { isActive: boolean }) {
   const typed = useTypewriter(TYPEWRITER_WORDS, 80, 45, 1600, isActive);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isActive) scrollRef.current?.scrollTo({ top: 0 });
+  }, [isActive]);
 
   const books = [
     { title: "Creativity Inc", author: "Ed Catmull" },
@@ -77,7 +82,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
       <PanelHeader title="About" />
 
       {/* Body: content left, image right — scroll together under header */}
-      <div className="flex-1 overflow-y-auto overscroll-none min-h-0 md:flex">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-none min-h-0 md:flex">
 
         {/* Left: content */}
         <div className="flex flex-col px-6 pb-16 pt-36 md:flex-1 md:px-10 md:pb-20 md:pt-40">
@@ -183,46 +188,48 @@ export function ExperienceContent() {
 
 export function ContactContent() {
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
+    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light min-h-0">
       <PanelHeader title="Contact" />
-      <div className="absolute left-1/2 top-1/2  z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-start gap-4 border border-white p-4 text-white/70">
-        <img
-          src="/Pictures/GregHead.png"
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-[-20%] h-20 -translate-x-1/2 -translate-y-1/2 select-none object-contain brightness-90 contrast-125"
-        />
-        <a href="mailto:changjgreg@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
-          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
-            <path d="M4 6h16v12H4z" />
-            <path d="m4 7 8 6 8-6" />
-          </svg>
-          changjgreg@gmail.com
-        </a>
-        <a
-          href="https://www.linkedin.com/in/gregjchang"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 transition-colors hover:text-white"
-        >
-          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-            <path d="M6.94 8.98H3.8V20h3.14V8.98ZM5.37 7.49a1.82 1.82 0 1 0 0-3.64 1.82 1.82 0 0 0 0 3.64ZM20.2 13.96c0-3.06-1.63-4.48-3.81-4.48a3.29 3.29 0 0 0-2.98 1.64h-.04V8.98h-3.01V20h3.14v-5.45c0-1.44.27-2.83 2.05-2.83 1.76 0 1.78 1.65 1.78 2.92V20h3.14v-6.04h-.27Z" />
-          </svg>
-          LinkedIn
-        </a>
-        <a
-          href="https://www.instagram.com/greg_chang_/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-3 transition-colors hover:text-white"
-        >
-          <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
-            <rect x="4" y="4" width="16" height="16" rx="5" />
-            <circle cx="12" cy="12" r="3.4" />
-            <circle cx="17.2" cy="6.8" r="0.8" fill="currentColor" stroke="none" />
-          </svg>
-          @greg_chang_
-        </a>
+      <div className="flex flex-1 flex-col items-center justify-center overflow-hidden touch-none px-6 pb-6 pt-36 md:px-10 md:pb-40 md:pt-44">
+        <div className="flex flex-col items-start gap-4 border border-white p-4 text-white/70 relative">
+          <img
+            src="/Pictures/GregHead.png"
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-[-20%] h-20 -translate-x-1/2 -translate-y-1/2 select-none object-contain brightness-90 contrast-125"
+          />
+          <a href="mailto:changjgreg@gmail.com" className="flex items-center gap-3 transition-colors hover:text-white">
+            <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
+            </svg>
+            changjgreg@gmail.com
+          </a>
+          <a
+            href="https://www.linkedin.com/in/gregjchang"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 transition-colors hover:text-white"
+          >
+            <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+              <path d="M6.94 8.98H3.8V20h3.14V8.98ZM5.37 7.49a1.82 1.82 0 1 0 0-3.64 1.82 1.82 0 0 0 0 3.64ZM20.2 13.96c0-3.06-1.63-4.48-3.81-4.48a3.29 3.29 0 0 0-2.98 1.64h-.04V8.98h-3.01V20h3.14v-5.45c0-1.44.27-2.83 2.05-2.83 1.76 0 1.78 1.65 1.78 2.92V20h3.14v-6.04h-.27Z" />
+            </svg>
+            LinkedIn
+          </a>
+          <a
+            href="https://www.instagram.com/greg_chang_/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 transition-colors hover:text-white"
+          >
+            <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden>
+              <rect x="4" y="4" width="16" height="16" rx="5" />
+              <circle cx="12" cy="12" r="3.4" />
+              <circle cx="17.2" cy="6.8" r="0.8" fill="currentColor" stroke="none" />
+            </svg>
+            @greg_chang_
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -232,15 +239,20 @@ export function WorksContent() {
   return (
     <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light min-h-0">
       <PanelHeader title="Works" />
-      <div className="flex flex-1 overflow-x-hidden overflow-y-auto overscroll-none min-h-0 px-6 pb-6 pt-36 md:px-10 md:pb-10 md:pt-44">
+      <div className="flex flex-1 overflow-x-hidden overflow-y-auto overscroll-none min-h-0 px-6 pt-36 md:px-10 md:pt-44" style={{ paddingBottom: "calc(6rem + env(safe-area-inset-bottom))" }}>
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 md:gap-14 lg:gap-16">
           {projects.map((project, index) => {
             const imageLeft = index % 2 === 0;
+            const Wrapper = project.url ? "a" : "article";
+            const wrapperProps = project.url
+              ? { href: project.url, target: "_blank", rel: "noopener noreferrer" }
+              : {};
 
             return (
-              <article
+              <Wrapper
                 key={project.id}
-                className="grid items-center gap-8 md:grid-cols-2 md:gap-12 lg:gap-16"
+                {...wrapperProps}
+                className="grid items-center gap-8 md:grid-cols-2 md:gap-12 lg:gap-16 group"
               >
                 <div
                   className={`flex items-center justify-center ${
@@ -276,17 +288,12 @@ export function WorksContent() {
                     {project.description}
                   </p>
                   {project.url && (
-                    <a
-                      href={project.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-5 inline-block text-sm text-white/90 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white md:mt-6"
-                    >
+                    <span className="mt-5 inline-block text-sm text-white/90 underline decoration-white/30 underline-offset-4 group-hover:text-white md:mt-6">
                       Visit site
-                    </a>
+                    </span>
                   )}
                 </div>
-              </article>
+              </Wrapper>
             );
           })}
         </div>

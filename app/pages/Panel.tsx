@@ -9,9 +9,17 @@ import {
 import { LuChevronDown, LuChevronLeft, LuChevronRight, LuChevronUp } from "react-icons/lu";
 import { useSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
 
-const SLIDE_DURATION = "var(--panel-slide-duration, 0.42s)";
+const SLIDE_DURATION_MS = 420;
 const SLIDE_BACK_DURATION_MS = 500;
 const SLIDE_EASING = "cubic-bezier(0.33, 1.1, 0.68, 1)";
+
+function entryTransform(animation: string): string {
+  if (animation.includes("Bottom")) return "translateY(100%)";
+  if (animation.includes("Top")) return "translateY(-100%)";
+  if (animation.includes("Left")) return "translateX(-100%)";
+  if (animation.includes("Right")) return "translateX(100%)";
+  return "translateY(100%)";
+}
 
 export const PanelNavContext = createContext<{
   onBack: () => void;
@@ -91,15 +99,29 @@ export function Panel({
 
   const containerRef = useSwipe(handleSwipe, isActive && swipeEnabled, naturalSwipe);
 
+  // Use CSS transitions instead of @keyframes animations so the settled active
+  // state is transform:none — no stacking context, no iOS scroll interference.
+  // When inactive the panel sits off-screen at its entry position, ready to
+  // slide back in. The exit is a plain opacity fade; the transform resets after
+  // the fade completes (via transition-delay) so it's invisible during reset.
+  const offScreen = entryTransform(animation);
+  const panelStyle: React.CSSProperties = isActive
+    ? {
+        transform: "none",
+        opacity: 1,
+        transition: `transform ${SLIDE_DURATION_MS}ms ${SLIDE_EASING}, opacity 0.05s ease`,
+      }
+    : {
+        transform: offScreen,
+        opacity: 0,
+        transition: `opacity ${SLIDE_BACK_DURATION_MS}ms ease-out, transform 0s linear ${SLIDE_BACK_DURATION_MS}ms`,
+      };
+
   return (
     <section
       ref={containerRef}
-      className={`h-screen flex flex-col bg-black absolute inset-0 ${isActive ? "" : "pointer-events-none"}`}
-      style={{
-        animation: isActive ? `${animation} ${SLIDE_DURATION} ${SLIDE_EASING} forwards` : undefined,
-        opacity: isActive ? 1 : 0,
-        transition: `opacity ${SLIDE_BACK_DURATION_MS}ms ease-out`,
-      }}
+      className={`flex flex-col bg-black absolute inset-0 ${isActive ? "" : "pointer-events-none"}`}
+      style={{ ...panelStyle, height: "100dvh" }}
     >
       <PanelNavContext.Provider value={{ onBack, swipeBackDirection }}>
         {header && (
