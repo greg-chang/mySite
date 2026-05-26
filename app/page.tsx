@@ -16,7 +16,12 @@ export default function Home() {
   const [view, setView] = useState<View>("menu");
   const [naturalSwipe, setNaturalSwipe] = useState(getDefaultSwipePreference);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
   const settingsDelayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
+  }, []);
 
   const goToMenu = () => setView("menu");
   const closeSettings = useCallback(() => setSettingsOpen(false), []);
@@ -40,15 +45,17 @@ export default function Home() {
         />
       </div>
 
-      <SettingsMenu
-        naturalSwipe={naturalSwipe}
-        onNaturalSwipeChange={setNaturalSwipe}
-        isOpen={settingsOpen}
-        onOpenChange={setSettingsOpen}
-      />
+      {!isTouch && (
+        <SettingsMenu
+          naturalSwipe={naturalSwipe}
+          onNaturalSwipeChange={setNaturalSwipe}
+          isOpen={settingsOpen}
+          onOpenChange={setSettingsOpen}
+        />
+      )}
 
       <div className={`absolute inset-0 ${menuReady ? "" : "pointer-events-none"}`}>
-        <Menu isActive={menuReady && view === "menu"} onNavigate={setView} naturalSwipe={naturalSwipe} onSwipe={closeSettings} />
+        <Menu isActive={menuReady && view === "menu"} onNavigate={setView} naturalSwipe={naturalSwipe} onSwipe={closeSettings} swipeEnabled={!isTouch} />
 
         <Panel
           isActive={view === "about"}
@@ -58,6 +65,7 @@ export default function Home() {
           swipeBackDirection="down"
           naturalSwipe={naturalSwipe}
           onSwipe={closeSettings}
+          swipeEnabled={!isTouch}
         >
           <AboutContent isActive={view === "about"} />
         </Panel>
@@ -70,6 +78,7 @@ export default function Home() {
           swipeBackDirection="left"
           naturalSwipe={naturalSwipe}
           onSwipe={closeSettings}
+          swipeEnabled={!isTouch}
         >
           <ExperienceContent />
         </Panel>
@@ -82,6 +91,7 @@ export default function Home() {
           swipeBackDirection="up"
           naturalSwipe={naturalSwipe}
           onSwipe={closeSettings}
+          swipeEnabled={!isTouch}
         >
           <ContactContent />
         </Panel>
@@ -94,6 +104,7 @@ export default function Home() {
           swipeBackDirection="right"
           naturalSwipe={naturalSwipe}
           onSwipe={closeSettings}
+          swipeEnabled={!isTouch}
         >
           <WorksContent />
         </Panel>

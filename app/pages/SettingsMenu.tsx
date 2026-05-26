@@ -98,7 +98,7 @@ export function SettingsMenu({
   }, [isOpen, onOpenChange]);
 
   return (
-    <div ref={containerRef} className="absolute right-4 top-4 z-50 font-mono">
+    <div ref={containerRef} className="fixed right-4 top-4 z-50 font-mono">
       <button
         type="button"
         onClick={() => onOpenChange(!isOpen)}

@@ -72,15 +72,15 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
   ];
 
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
+    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light min-h-0">
 
       <PanelHeader title="About" />
-    
+
       {/* Body: content left, image right — scroll together under header */}
-      <div className="flex flex-1 overflow-auto">
+      <div className="flex-1 overflow-y-auto overscroll-none min-h-0 md:flex">
 
         {/* Left: content */}
-        <div className="flex flex-1 flex-col px-6 pb-16 pt-36 md:px-10 md:pb-20 md:pt-40">
+        <div className="flex flex-col px-6 pb-16 pt-36 md:flex-1 md:px-10 md:pb-20 md:pt-40">
 
           {/* Typewriter hero */}
           <div className="mb-10 md:mb-14">
@@ -170,9 +170,9 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
 
 export function ExperienceContent() {
   return (
-    <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light">
+    <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light min-h-0">
       <PanelHeader title="Experiences" />
-      <div className="flex flex-1 overflow-auto px-6 pb-6 pt-36 md:px-10 md:pb-10 md:pt-44">
+      <div className="flex flex-1 overflow-auto overscroll-none min-h-0 px-6 pb-6 pt-36 md:px-10 md:pb-10 md:pt-44">
         <div className="flex w-full flex-col">
           <Experience />
         </div>
@@ -230,23 +230,20 @@ export function ContactContent() {
 
 export function WorksContent() {
   return (
-    <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light">
+    <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light min-h-0">
       <PanelHeader title="Works" />
-
-      <div className="flex flex-1 overflow-auto px-6 md:px-10">
-        <div className="mx-auto flex w-full max-w-5xl min-h-full flex-col">
-          <div className="shrink-0 h-32 md:h-40" aria-hidden />
-          <div className="flex flex-1 flex-col justify-center gap-10 pb-16 md:gap-14 md:pb-20 lg:gap-16">
+      <div className="flex flex-1 overflow-x-hidden overflow-y-auto overscroll-none min-h-0 px-6 pb-6 pt-36 md:px-10 md:pb-10 md:pt-44">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 md:gap-14 lg:gap-16">
           {projects.map((project, index) => {
             const imageLeft = index % 2 === 0;
 
             return (
               <article
                 key={project.id}
-                className="grid items-center gap-8 md:grid-cols-2 md:gap-2 lg:gap-16"
+                className="grid items-center gap-8 md:grid-cols-2 md:gap-12 lg:gap-16"
               >
                 <div
-                  className={`flex min-h-[180px] items-center justify-center md:min-h-[220px] ${
+                  className={`flex items-center justify-center ${
                     imageLeft ? "md:order-1" : "md:order-2"
                   }`}
                 >
@@ -254,9 +251,10 @@ export function WorksContent() {
                     <img
                       src={project.imageSrc}
                       alt={project.imageAlt || project.title}
+                      draggable="false"
                       className={
                         project.imageClassName ??
-                        "max-h-64 max-w-md rounded-lg object-contain md:max-h-80"
+                        "max-h-64 max-w-md rounded-lg object-contain md:max-h-80 select-none pointer-events-none"
                       }
                     />
                   ) : (
@@ -291,7 +289,6 @@ export function WorksContent() {
               </article>
             );
           })}
-          </div>
         </div>
       </div>
     </div>

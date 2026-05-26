@@ -31,7 +31,7 @@ const MENU_HOLD_MS = 650;
 const LANDSCAPE_EXPLOSION_FILL = { width: 0.9, height: 0.65 };
 const PORTRAIT_EXPLOSION_FILL = { width: 0.78, height: 0.88 };
 
-const MENU_LINES = [
+const MENU_LINES_DESKTOP = [
   "Greg's site",
   "",
   "v About",
@@ -39,6 +39,22 @@ const MENU_LINES = [
   "< Experience",
   "",
   "> Works",
+  "",
+  "^ Contact",
+];
+
+const MENU_LINES_TOUCH = [
+  "Greg's site",
+  "",
+  "",
+  "v About",
+  "",
+  "",
+  "< Experience",
+  "",
+  "",
+  "> Works",
+  "",
   "",
   "^ Contact",
 ];
@@ -196,11 +212,11 @@ function particlesToFrame(particles: Particle[]): string[][] {
   return frame;
 }
 
-function getMenuTargetPoints(): TargetPoint[] {
+function getMenuTargetPoints(lines: string[]): TargetPoint[] {
   const points: TargetPoint[] = [];
-  const startY = Math.floor((ROWS - MENU_LINES.length) / 2);
+  const startY = Math.floor((ROWS - lines.length) / 2);
 
-  MENU_LINES.forEach((line, lineIndex) => {
+  lines.forEach((line, lineIndex) => {
     const startX = Math.floor((COLS - line.length) / 2);
     for (let charIndex = 0; charIndex < line.length; charIndex++) {
       const char = line[charIndex];
@@ -216,8 +232,8 @@ function getMenuTargetPoints(): TargetPoint[] {
   return points;
 }
 
-function assignMenuTargets(particles: Particle[]) {
-  const targets = getMenuTargetPoints();
+function assignMenuTargets(particles: Particle[], lines: string[]) {
+  const targets = getMenuTargetPoints(lines);
   if (targets.length === 0) return;
 
   particles.forEach((particle, index) => {
@@ -276,6 +292,7 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
   const pointerDownYRef = useRef(0);
   const hasMovedRef = useRef(false);
   const [showIntroCta, setShowIntroCta] = useState(true);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const menuFormedRef = useRef(false);
   const menuHoldTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onMenuReadyRef = useRef(onMenuReady);
@@ -283,8 +300,19 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
   const lastTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const touch = window.matchMedia("(pointer: coarse)").matches;
+    setIsTouchDevice(touch);
+  }, []);
+
+  useEffect(() => {
     let animationId: number;
     const TARGET_FRAME_MS = 1000 / 60;
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    const menuLines = isTouch ? MENU_LINES_TOUCH : MENU_LINES_DESKTOP;
+    const explodeDuration = isTouch ? 90 : EXPLODE_DURATION_FRAMES;
+    const holdFrames = isTouch ? 52 : EXPLODE_HOLD_OFF_SCREEN_FRAMES;
+    const convergeLerp = isTouch ? 0.1 : CONVERGE_LERP;
+    const menuHoldMs = isTouch ? 400 : MENU_HOLD_MS;
 
     const tick = (now: number) => {
       if (explodingRef.current) {
@@ -317,12 +345,12 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
             ? explodeFrameRef.current - atEdgeSinceFrameRef.current
             : 0;
         const timeout =
-          explodeFrameRef.current >= EXPLODE_DURATION_FRAMES;
-        const holdDone = holdElapsed >= EXPLODE_HOLD_OFF_SCREEN_FRAMES;
+          explodeFrameRef.current >= explodeDuration;
+        const holdDone = holdElapsed >= holdFrames;
         if ((allAtEdge && holdDone) || timeout) {
           explodingRef.current = false;
           atEdgeSinceFrameRef.current = null;
-          assignMenuTargets(particlesRef.current);
+          assignMenuTargets(particlesRef.current, menuLines);
           convergeRef.current = true;
         }
       } else if (convergeRef.current) {
@@ -333,8 +361,8 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
           const dx = p.targetX - p.x;
           const dy = p.targetY - p.y;
           if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1) {
-            p.x += dx * CONVERGE_LERP;
-            p.y += dy * CONVERGE_LERP;
+            p.x += dx * convergeLerp;
+            p.y += dy * convergeLerp;
             allDone = false;
           } else {
             p.x = p.targetX;
@@ -349,7 +377,7 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
           if (preRef.current) preRef.current.textContent = text;
           menuHoldTimeoutRef.current = setTimeout(() => {
             onMenuReadyRef.current?.();
-          }, MENU_HOLD_MS);
+          }, menuHoldMs);
         } else {
           const frame = particlesToFrame(particles);
           const text = frame.map((row) => row.join("")).join("\n");
@@ -479,7 +507,9 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
         ref={preRef}
         className="font-mono text-white leading-none tracking-tight select-none w-full h-full flex items-center justify-center pointer-events-none m-0"
         style={{
-          fontSize: "clamp(0.7rem, min(100vw / 80, 150vh / 80), 2rem)",
+          fontSize: isTouchDevice
+            ? "clamp(1.05rem, min(100vw / 77, 150vh / 77), 2.5rem)"
+            : "clamp(1rem, min(100vw / 77, 150vh / 77), 2.5rem)",
           fontFamily:
             "ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace",
         }}

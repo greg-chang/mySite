@@ -3,6 +3,13 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --panel-slide-duration: 0.42s;
+}
+
+@media (pointer: coarse) {
+  :root {
+    --panel-slide-duration: 0.5s;
+  }
 }
 
 @theme inline {

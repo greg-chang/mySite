@@ -6,12 +6,12 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { LuChevronDown, LuChevronLeft, LuChevronRight, LuChevronUp } from "react-icons/lu";
 import { useSwipe, type SwipeDirection } from "../hooks/usePanelSwipe";
 
-const SLIDE_DURATION = "0.42s";
+const SLIDE_DURATION = "var(--panel-slide-duration, 0.42s)";
 const SLIDE_BACK_DURATION_MS = 500;
 const SLIDE_EASING = "cubic-bezier(0.33, 1.1, 0.68, 1)";
-import { LuChevronDown, LuChevronLeft, LuChevronRight, LuChevronUp } from "react-icons/lu";
 
 export const PanelNavContext = createContext<{
   onBack: () => void;
@@ -62,6 +62,7 @@ export interface PanelProps {
   swipeBackDirection: SwipeDirection;
   naturalSwipe: boolean;
   onSwipe?: () => void;
+  swipeEnabled?: boolean;
   children: ReactNode;
   header?: ReactNode;
 }
@@ -74,6 +75,7 @@ export function Panel({
   swipeBackDirection,
   naturalSwipe,
   onSwipe,
+  swipeEnabled = true,
   children,
   header,
 }: PanelProps) {
@@ -87,7 +89,7 @@ export function Panel({
     [swipeBackDirection, onSwipeBack, onSwipe],
   );
 
-  const containerRef = useSwipe(handleSwipe, isActive, naturalSwipe);
+  const containerRef = useSwipe(handleSwipe, isActive && swipeEnabled, naturalSwipe);
 
   return (
     <section
