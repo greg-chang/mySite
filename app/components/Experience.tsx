@@ -1,12 +1,12 @@
 "use client";
 
+import { animate } from "framer-motion";
 import { useLayoutEffect, useRef, useState } from "react";
 import { experiences } from "../data/experiences";
 
 const rowClassName =
   "group relative -mx-6 px-6 py-5 md:-mx-10 md:px-10 rounded-lg";
 
-/** Keeps title + summary + expanded details clear of the Experiences panel header when scrolling. */
 const scrollTargetClassName =
   "scroll-mt-36 md:scroll-mt-44 [scroll-margin-bottom:2.5rem]";
 
@@ -19,7 +19,6 @@ export function Experience() {
     const el = sectionRefs.current[activeExperienceId];
     if (!el) return;
 
-    // Walk up to find the panel's scroll container — stop before reaching the document
     let scrollParent: HTMLElement | null = el.parentElement;
     while (scrollParent) {
       const { overflowY } = window.getComputedStyle(scrollParent);
@@ -28,6 +27,7 @@ export function Experience() {
     }
     if (!scrollParent) return;
 
+    let controls: { stop: () => void } | undefined;
     const frame = requestAnimationFrame(() => {
       const containerRect = scrollParent!.getBoundingClientRect();
       const elRect = el.getBoundingClientRect();
@@ -37,10 +37,22 @@ export function Experience() {
         containerRect.top -
         containerRect.height / 2 +
         elRect.height / 2;
-      scrollParent!.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+
+      controls = animate(scrollParent!.scrollTop, Math.max(0, target), {
+        type: "spring",
+        stiffness: 140,
+        damping: 24,
+        mass: 0.7,
+        onUpdate: (latest) => {
+          scrollParent!.scrollTop = latest;
+        },
+      });
     });
 
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      controls?.stop();
+    };
   }, [activeExperienceId]);
 
   return (
@@ -50,7 +62,12 @@ export function Experience() {
 
         return (
           <div key={exp.id} className={`${rowClassName} mb-10 last:mb-0`}>
-            <div ref={(el) => { sectionRefs.current[exp.id] = el; }} className={scrollTargetClassName}>
+            <div
+              ref={(el) => {
+                sectionRefs.current[exp.id] = el;
+              }}
+              className={scrollTargetClassName}
+            >
               <button
                 type="button"
                 className="block w-full cursor-pointer bg-transparent p-0 text-left"
