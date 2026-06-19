@@ -27,17 +27,17 @@ export const experiences: ExperienceEntry[] = [
     image: "/experiences/MESA.png",
     details: {
       context:
-        "A busy physical therapy clinic is a particular kind of environment — patients are often in pain, uncertain about their recovery, and moving through a space that can feel clinical and impersonal. The job description is logistical: set up stations, maintain cleanliness, assist with equipment. The actual job is making people feel safe enough to do hard things.",
+        "A busy PT clinic puts you in front of dozens of different people every day — different ages, backgrounds, races, income levels, life situations — all in some state of pain or uncertainty about their recovery. It's less a job about equipment and more a daily test of how genuinely you can connect with people who have nothing in common except needing to be there.",
       approach:
-        "I focused on the human layer first. Before explaining an exercise, I'd try to read where the patient was — anxious, frustrated, checked-out — and meet them there. Explaining why an exercise works (the mechanism, not just the instruction) helped compliance more than repetition. People do things they understand.",
+        "I didn't try to have one approach that worked for everyone — I tried to actually meet each person where they were that day. Some people wanted to talk, some wanted quiet, some needed to be walked through the same explanation three times without feeling rushed. Staying genuine instead of performing \"professional\" was what actually built trust over time.",
       execution: [
-        "Guided patients through prescribed exercise routines, explaining mechanisms and expected outcomes",
-        "Prepared and maintained rehabilitation stations including hydrotherapy, ice/heat, and HyperIce setups for lymphedema patients",
-        "Maintained clinic cleanliness and equipment readiness across a high-volume schedule",
-        "Provided consistent, calm presence for patients navigating difficult or unfamiliar recovery processes",
+        "Guided patients through exercise routines, explaining mechanisms and expected outcomes in plain terms",
+        "Prepared rehab stations including hydrotherapy, ice/heat, and HyperIce setups for lymphedema patients",
+        "Built real relationships with patients across a wide range of ages, backgrounds, and life circumstances",
+        "Maintained composure and warmth across a high-volume, emotionally varied daily schedule",
       ],
       signal:
-        "This role sits differently from the rest of my experience, and I include it intentionally. It taught me that communication under load — when someone is uncomfortable, confused, or just wants to be heard — is a skill you can get better at. I use it differently now when I'm talking to users, running workshops, or explaining a technical decision to a non-technical stakeholder. The context changes; the underlying skill doesn't.",
+        "This was less a job and more a daily test of the values I actually hold — candor, curiosity, humility — under real conditions, with real people, not abstractions. I came out of it having made genuine friends I wouldn't have otherwise met, and a much better sense of how to manage my own emotions while showing up for someone else's hard day.",
     },
   },
   {
@@ -51,16 +51,16 @@ export const experiences: ExperienceEntry[] = [
     url: "https://mesausa.org/",
     details: {
       context:
-        "MESA serves first-generation and underrepresented students in STEM, but the program didn't have a structured way to teach prototyping or product thinking — skills that are increasingly expected even in early internships. The gap wasn't motivation; it was exposure.",
+        "MESA serves first-generation and underrepresented students in STEM, but the program had no structured way to teach prototyping or product thinking. The gap wasn't motivation — it was exposure.",
       approach:
-        "I chose the hackathon format deliberately over a lecture series because I wanted students to learn by doing and that it didn't matter if they didn't finish but that the ideation and prototyping process was more important than the product. I ran workshops on Figma and React not because they're the only tools, but because they are directly applicable skills in the modern tech world.\n\nOn the data side, I chose to build pipelines in R rather than just export spreadsheets, because I wanted the analysis to be reproducible — if someone asked a different question next year, the infrastructure would still be there.",
+        "I chose a hackathon format over lectures because building and fixing something broken in a day teaches more than a curriculum does. On the data side, I built reproducible R pipelines rather than one-off spreadsheets, so the analysis could outlast me.",
       execution: [
         "Designed and led hands-on workshops in UI/UX, prototyping, and web development for 50+ students",
-        "Built R data pipelines to collect, clean, and analyze feedback across ~370 students and advisors",
-        "Produced reports that surfaced patterns in engagement and curriculum gaps",
+        "Built R data pipelines analyzing feedback across ~370 students and advisors",
+        "Produced reports surfacing engagement patterns and curriculum gaps",
       ],
       signal:
-        "The reports informed outreach and curriculum decisions indirectly — they didn't single-handedly change a policy, but they gave advisors language and evidence for conversations they were already having. That's a quieter kind of impact, but it's honest. What I'd do differently: get earlier buy-in from advisors on what questions they actually needed answered, before building the pipeline.",
+        "The reports informed outreach and curriculum decisions indirectly — a quieter kind of impact, but honest. Next time, I'd get advisor buy-in on the questions before building the pipeline.",
     },
   },
   {
@@ -84,13 +84,36 @@ export const experiences: ExperienceEntry[] = [
         "Shipped improvements across maps, notifications, security, and ride request flows",
       ],
       signal:
-        "Driver postings up 45%, NPS +16%, scaled from 200 to 1,100+ users. Retention at semester transitions remained the unsolved problem — and the one I'd tackle first if I went back.",
+        "Driver postings up 45%, NPS +16%, scaled from 200 to 1,100+ users.",
+    },
+  },
+  {
+    id: "3",
+    title: "Assistant Data Scientist",
+    organization: "CAIEF · UC Davis · Davis, CA",
+    description:
+      "Collected literature corpus for upcoming AI Humanities Center developed by College of Letters and Science",
+    period: "Mar '24 – Jun '24",
+    image: "/experiences/Datalab.png",
+    url: "https://caief.ucdavis.edu/",
+    details: {
+      context:
+        "CAIEF (the college's planned AI Humanities Center) needed a literature corpus ready before the Center officially formed, so research could hit the ground running. No one had a systematic way to extract that volume of journal content from the UC Davis Library at scale.",
+      approach:
+        "I worked on a 3-person team building an RSelenium web crawler against the library system, since standard scraping didn't work on that site. I focused on the crawler mechanics and diagnosing what broke — page-load timing, pagination, ISSN parsing — while teammates handled data frame structuring and coordination. We ran into real infrastructure friction: CrossRef's API had changed since the original code was written, and the DataSci server didn't support a package the crawler depended on, so we ran it locally instead.",
+      execution: [
+        "Worked on the RSelenium crawler logic and diagnosed page-load, pagination, and crash issues across 14 journal categories",
+        "Helped recover ~20,000 journals and associated metadata (titles, volumes, issues, DOIs, ISSNs)",
+        "Diagnosed a CrossRef API documentation change and a DataSci server package conflict that blocked remote execution",
+      ],
+      signal:
+        "We recovered about 80% of every category before time ran out — solid, but incomplete. The corpus got used, then the program's funding was cut and the work went dormant. Good infrastructure isn't enough if the institutional support around it disappears.",
     },
   },
   {
     id: "4",
     title: "Assistant Visualization Researcher",
-    organization: "DataLab · Davis, CA",
+    organization: "DataLab · UC Davis · Davis, CA",
     description:
       "Integrated 3D Gaussian Splatting into Linux environment to improve accuracy and clarity of images in VR spaces",
     period: "Nov '23 – Sep '24",
@@ -98,45 +121,22 @@ export const experiences: ExperienceEntry[] = [
     url: "https://datalab.ucdavis.edu/",
     details: {
       context:
-        "The lab was exploring how to represent physical spaces in VR with enough accuracy to be useful for research purposes. Existing photogrammetry methods were producing images that were too noisy or geometrically imprecise for the use cases being explored.",
+        "The lab needed to represent physical spaces in VR accurately enough for research. Existing photogrammetry methods were too noisy or imprecise for that.",
       approach:
-        "3D Gaussian Splatting was a relatively new technique at the time that represented scenes as collections of 3D gaussians rather than meshes — it produces significantly cleaner results for static scenes and was worth testing in this context. The challenge wasn't the algorithm itself; it was getting the toolchain running correctly in a Linux environment with finicky GPU driver dependencies.",
+        "3D Gaussian Splatting produces cleaner results for static scenes than mesh-based methods, so it was worth testing. The real challenge wasn't the algorithm — it was getting the toolchain stable in a Linux environment with finicky GPU drivers.",
       execution: [
-        "Integrated 3D Gaussian Splatting pipeline into a Linux research environment",
-        "Diagnosed driver conflicts using Bash scripts and identified the correct Nvidia installation path",
-        "Improved image accuracy and visual clarity in the VR output",
+        "Integrated a 3D Gaussian Splatting pipeline into a Linux research environment",
+        "Diagnosed driver conflicts via Bash scripts and identified the correct Nvidia install path",
+        "Improved image accuracy and visual clarity in VR output",
       ],
       signal:
-        "Like the data science role, this work also landed in the same funding cut. The technical integration worked, but the research direction didn't get to continue. What I took from it: debugging environments is underrated as a skill — the actual algorithm implementation was maybe 20% of the work. Getting the infrastructure to not fight you is the other 80%.",
-    },
-  },
-  {
-    id: "3",
-    title: "Assistant Data Scientist",
-    organization: "CAIEF · Davis, CA",
-    description:
-      "Collected literature corpus for upcoming Center for Artificial Intelligence and Experimental Futures (CAIEF) at UC Davis",
-    period: "Mar '24 – Jun '24",
-    image: "/experiences/Datalab.png",
-    url: "https://caief.ucdavis.edu/",
-    details: {
-      context:
-        "The College of Letters and Science was building an AI Humanities Center (CAIEF) and needed a corpus of literary works to train and test research workflows. The problem wasn't that the works didn't exist — it was that there was no systematic way to find, extract, and organize them at scale.",
-      approach:
-        "Elsevier had the literary corpus CAIEF needed, but no structured way to extract it at scale. I chose R for the scraping workflow because the text processing libraries mapped well to the problem and because I could make the pipeline reproducible for whoever came after me. I prioritized building a searchable metadata structure from the start — not a flat file dump — the difference between researchers finding things in minutes versus hours.",
-      execution: [
-        "Built a custom R web scraping workflow against Elsevier to identify, extract, and process 4,000+ literary works",
-        "Created a searchable metadata database keyed to CAIEF research needs",
-        "Developed data cleaning pipelines with logging to maintain integrity throughout collection",
-      ],
-      signal:
-        "The database was used and the pipeline worked. Then the program's funding was cut. The work is technically there — 4,000+ works, clean and searchable — but dormant. That outcome taught me something about research infrastructure: it's only as durable as the institutional support around it. Building good tools isn't enough if the context that needs them disappears.",
+        "The integration worked — cleaner, more accurate VR output than the photogrammetry baseline. The bigger lesson was about where time actually goes: debugging environments is underrated as a skill. The algorithm was maybe 20% of the work; getting the infrastructure to stop fighting me was the other 80%.",
     },
   },
   {
     id: "5",
     title: "Software Engineer",
-    organization: "CodeLab · Davis, CA",
+    organization: "CodeLab Davis · Davis, CA",
     description:
       "Developed flashcard website that integrated spaced repetition to improve learning efficiency",
     period: "Oct '23 – Jun '24",
@@ -144,16 +144,16 @@ export const experiences: ExperienceEntry[] = [
     url: "https://codelabdavis.medium.com/interactive-learning-tool-espresso-551f1263925d",
     details: {
       context:
-        "Quizlet is convenient but passive — flashcards without spacing logic don't actually build retention. Anki has the algorithm but the UX is dated and intimidating for most students. The opportunity was in the middle: spaced repetition with an interface people would actually want to open.",
+        "Quizlet is convenient but passive; Anki has the algorithm but dated, intimidating UX. The opportunity was spaced repetition with an interface people would actually want to open.",
       approach:
-        "My role was frontend — I focused on making the study experience feel low-friction and visually clear. A flashcard app lives or dies on how fast you can get into a flow state; if the UI interrupts you, the algorithm doesn't matter. I worked within a student team which meant shipping iteratively and adapting based on what teammates were building on the backend.",
+        "My role was frontend — making the study flow feel low-friction and visually clear, since a flashcard app lives or dies on whether the UI gets out of the way. I shipped iteratively within a student team, adapting to what teammates were building on the backend.",
       execution: [
-        "Built the frontend study experience focused on flow and visual clarity",
-        "Collaborated with a cross-functional student team to ship features iteratively",
-        "Iterated on UI based on user feedback throughout the academic year",
+        "Built the frontend study experience with a focus on flow state and visual clarity",
+        "Shipped features iteratively with a cross-functional student team",
+        "Iterated on UI based on ongoing user feedback",
       ],
       signal:
-        "The product shipped and got written up. What I learned about working on a team with fixed scope and timeline: frontend decisions that seem cosmetic (spacing, transition speed, card flip behavior) actually determine whether someone uses the tool or abandons it after one session. I've been more deliberate about interaction details ever since.",
+        "The product shipped and got written up. Cosmetic-seeming decisions — spacing, transition speed, card flip — actually determine whether someone keeps using a tool. I've been deliberate about interaction details ever since.",
     },
   },
   {
@@ -167,17 +167,16 @@ export const experiences: ExperienceEntry[] = [
     url: "https://www.toki.tokyo/",
     details: {
       context:
-        "TOKI is a travel agency in Tokyo, and the two problems I was brought in to work on were pretty different from each other: agents were spending too much time building itineraries from scratch, and the finance team had no clean way to see where money was going across their different events.",
+        "Travel agents at TOKI spent disproportionate time on itinerary planning — repetitive work that needed domain knowledge but not judgment at every step.",
       approach:
-        "For the chatbot, I used Flask and LangChain with OpenAI's API — a conversational interface made sense because agents already worked in natural language with clients. The goal was route mapping and ideation: give agents a fast way to explore options and rough out a trip before doing the detail work themselves. It wasn't meant to replace their judgment, just to get them past the blank page faster.\n\nFor the financial side, the problem was that all their data lived in sheets that weren't organized in a way that let you ask useful questions. I built pipelines to restructure everything by event, so the team could actually see what was happening per trip rather than wading through a flat dump of transactions.",
+        "I used Flask and LangChain with OpenAI's API because agents already worked in natural language with clients — a chatbot in that same register lowered the switching cost. The goal was handling scaffolding, not replacing their judgment.",
       execution: [
-        "Developed an AI travel chatbot with Flask, LangChain, and OpenAI's API for route mapping and itinerary ideation",
-        "Enabled agents to support 3x more customers per week by reducing time spent on planning scaffolding",
-        "Built data pipelines to reorganize financial records by event, giving the ops team cleaner insight into per-trip costs",
-        "Worked with the finance team to structure the data around the questions they actually needed answered",
+        "Developed an AI travel chatbot with Flask, LangChain, and OpenAI's API",
+        "Reduced manual itinerary planning time, enabling 3x more customers per agent per week",
+        "Built a financial model with finance and ops teams to improve budget tracking",
       ],
       signal:
-        "3x customer capacity per agent was the headline. What the internship actually taught me was more foundational: working with early LLMs in production in 2023 meant running into their real limits constantly — hallucinated itinerary details, formatting inconsistencies that broke agent trust, context window gaps that caused the model to lose track of earlier conversation. Those failures gave me an early, grounded understanding that LLMs are fundamentally prediction models, not knowledge bases. That distinction matters — it changes how you prompt, what you trust, and when you don't hand something off to the model at all.",
+        "Working with early LLMs in 2023 meant hitting real limits constantly — hallucinations, formatting breaks, context loss. It gave me an early, grounded sense that LLMs are prediction models, not knowledge bases, and a discernment about AI I've carried into every project since.",
     },
   },
 ];

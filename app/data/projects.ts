@@ -18,7 +18,7 @@ export const projects: Project[] = [
     imageSrc: "/projects/MooberLogo.svg",
     imageAlt: "Moober project preview",
     imageClassName: "h-40 w-40 md:h-56 md:w-56 [image-rendering:pixelated] select-none pointer-events-none",
-    url: "https://mooberdavis.com/",
+    url: "https://aggieworks.org/products/moober/learnmore",
   },
   {
     id: "espresso",

@@ -66,7 +66,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
     { title: "On Earth We're Briefly Gorgeous", author: "Ocean Vuong" },
   ];
 
-  const sports = [
+  const hobbies = [
     "Parkour / Freerunning / Tricking",
     "Trampolining",
     "Skateboarding",
@@ -74,6 +74,8 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
     "Tennis",
     "Badminton",
     "Ping Pong",
+    "Photography",
+    "Digital Art",
   ];
 
   return (
@@ -161,11 +163,11 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
 
           <hr className="mb-10 border-white/8 md:mb-14" />
 
-          {/* Movement */}
+          {/* Hobbies */}
           <section>
-            <p className="mb-4 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Movement</p>
+            <p className="mb-4 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Hobbies</p>
             <p className="text-base leading-loose text-white/55">
-              {sports.join(" · ")}
+              {hobbies.join(" · ")}
             </p>
           </section>
         </div>
