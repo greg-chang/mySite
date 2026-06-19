@@ -27,7 +27,7 @@ export const experiences: ExperienceEntry[] = [
     image: "/experiences/MESA.png",
     details: {
       context:
-        "A busy PT clinic puts you in front of dozens of different people every day – different ages, backgrounds, races, income levels, life situations — all in some state of pain or uncertainty about their recovery. It's less a job about equipment and more a daily test of how genuinely you can connect with people who have nothing in common except needing to be there.",
+        "A busy PT clinic puts you in front of dozens of different people every day – different ages, backgrounds, races, income levels, life situations — all in some state of pain or uncertainty about their recovery.",
       approach:
         "I tried to meet each person where they were that day. Some people wanted to talk, some wanted quiet, some needed to be walked through the same explanation three times without feeling rushed. Staying genuine instead of performing \"professional\" was what really built trust over time.",
       execution: [
@@ -37,7 +37,7 @@ export const experiences: ExperienceEntry[] = [
         "Maintained composure and warmth across a high-volume, emotionally varied daily schedule",
       ],
       signal:
-        "This was less a job and more a daily test of the values I actually hold — candor, curiosity, humility — under real conditions, with real people. I came out of it having made genuine connections I wouldn't have otherwise met, and a much better sense of how to manage my own emotions while showing up for someone else's hard day.",
+        "This job was a daily test of the values I actually hold — candor, curiosity, humility — under real conditions, with real people. I came out of it having made genuine connections I wouldn't have otherwise met, and a much better sense of how to manage my own emotions while showing up for someone else's hard day.",
     },
   },
   {
@@ -53,11 +53,11 @@ export const experiences: ExperienceEntry[] = [
       context:
         "MESA serves first-generation and underrepresented students in STEM, but the program had no structured way to teach prototyping or product thinking. The gap was exposure.",
       approach:
-        "I chose a hackathon format over lectures because building something directly teaches more than a curriculum does. On the data side, I built reproducible R pipelines rather than one-off spreadsheets, so the analysis could outlast me.",
+        "I chose a hackathon format over lectures because building something directly teaches more than a curriculum does. On the data side for MESA, I built reproducible R pipelines and wrote data reports for future curriculum decisions.",
       execution: [
-        "Designed and led hands-on workshops in UI/UX, prototyping, and web development for 50+ students",
+        "Designed and led hands-on workshops MESA's first hackathon in UI/UX, prototyping, and web development for 50+ students",
         "Built R data pipelines analyzing feedback across ~370 students and advisors",
-        "Produced reports surfacing engagement patterns and curriculum gaps",
+        "Produced reports surfacing engagement patterns and demographic data",
       ],
       signal:
         "Led the first hackathon for MESA and the reports informed outreach and curriculum decisions indirectly.",
@@ -168,11 +168,11 @@ export const experiences: ExperienceEntry[] = [
     url: "https://www.toki.tokyo/",
     details: {
       context:
-        "TOKI needed UI improvements on their Ruby on Rails site, and separately, their travel employees wanted a faster way to ideate itinerary ideas for clients rather than starting from scratch each time.",
+        "TOKI needed UI improvements on their site, and separately, their travel employees wanted a faster way to ideate itinerary ideas for clients rather than starting from scratch each time.",
       approach:
-        "The UI work was straightforward iteration on their existing Rails frontend. The more interesting problem was the chatbot — I prototyped it with Flask and LangChain on top of OpenAI's API while it was still early and the tooling around it was thin, aimed at giving employees a starting point to riff on rather than a finished plan to hand to clients.",
+        "The UI work was straightforward iteration on their existing Rails frontend. The more interesting problem was the chatbot — I prototyped it with Flask and LangChain on top of OpenAI's API while it was still early and the tooling around it was thin, aiming to provide employees a starting point to base on improving their workflow.",
       execution: [
-        "Shipped UI improvements on TOKI's Ruby on Rails website",
+        "Shipped UI improvements on TOKI's  website",
         "Prototyped an internal chatbot using Flask, LangChain, and early OpenAI API access to help employees ideate travel itineraries",
         "Built a financial model with finance and ops teams to improve budget tracking",
       ],
