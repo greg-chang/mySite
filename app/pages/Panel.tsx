@@ -97,7 +97,7 @@ export function Panel({
     [swipeBackDirection, onSwipeBack, onSwipe],
   );
 
-  const containerRef = useSwipe(handleSwipe, isActive && swipeEnabled, naturalSwipe);
+  const containerRef = useSwipe(handleSwipe, isActive && swipeEnabled, naturalSwipe, swipeBackDirection);
 
   // Use CSS transitions instead of @keyframes animations so the settled active
   // state is transform:none — no stacking context, no iOS scroll interference.

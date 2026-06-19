@@ -4,6 +4,7 @@ export type SwipeDirection = "left" | "right" | "up" | "down";
 
 const SWIPE_THRESHOLD = 50;
 const TOUCH_THRESHOLD = 60; // slightly higher than wheel — touch deltas are in physical px
+const EDGE_PX = 36; // px from screen edge that qualifies as an edge swipe
 const WHEEL_RESET_MS = 150;
 const PROJECT_SWIPE_LOCK_MS = 900;
 
@@ -35,6 +36,7 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   onSwipe: (direction: SwipeDirection) => void,
   enabled: boolean,
   naturalSwipe: boolean,
+  touchEdgeDirection?: SwipeDirection,
 ) {
   const wheelAccumRef = useRef({ x: 0, y: 0 });
   const wheelResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -47,9 +49,11 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
   const enabledRef = useRef(enabled);
   const naturalSwipeRef = useRef(naturalSwipe);
   const onSwipeRef = useRef(onSwipe);
+  const touchEdgeDirectionRef = useRef(touchEdgeDirection);
   enabledRef.current = enabled;
   naturalSwipeRef.current = naturalSwipe;
   onSwipeRef.current = onSwipe;
+  touchEdgeDirectionRef.current = touchEdgeDirection;
 
   // Reset accumulator whenever enabled changes (no listener remount needed).
   useEffect(() => {
@@ -134,8 +138,26 @@ export function useSwipe<T extends HTMLElement = HTMLElement>(
     const onTouchStart = (e: TouchEvent) => {
       if (!enabledRef.current) return;
       if (e.touches.length !== 1) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
+
+      const x = e.touches[0].clientX;
+      const y = e.touches[0].clientY;
+
+      // If a swipe-back direction is set, only accept touches that start near
+      // the corresponding screen edge (opposite side — where the gesture begins).
+      const edgeDir = touchEdgeDirectionRef.current;
+      if (edgeDir) {
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const nearEdge =
+          (edgeDir === "left"  && x > w - EDGE_PX) ||
+          (edgeDir === "right" && x < EDGE_PX) ||
+          (edgeDir === "up"    && y > h - EDGE_PX) ||
+          (edgeDir === "down"  && y < EDGE_PX);
+        if (!nearEdge) return;
+      }
+
+      touchStartX = x;
+      touchStartY = y;
       didScroll = false;
       window.addEventListener("scroll", onScrollDuringTouch, { passive: true, capture: true });
     };
