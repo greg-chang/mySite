@@ -119,7 +119,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
                 {
                   n: "01",
                   title: "Candor",
-                  body: "I try to talk to people the way I'd talk to a friend, and to withhold judgment long enough to actually hear them. When I disagree, I'd rather ask how someone got there than tell them why they're wrong. I'm curious how people see the world, not just what they think about it.",
+                  body: "I try to talk to people the way I'd talk to a friend, and to withhold judgment long enough to hear them out. When I disagree, I'd rather try and figure out how someone got to that mindset than telling them why they're wrong. I'm curious how people see the world, not just what they think about it.",
                 },
                 {
                   n: "02",
