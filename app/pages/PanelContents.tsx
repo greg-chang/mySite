@@ -41,13 +41,13 @@ function useTypewriter(words: string[], typingSpeed = 80, deletingSpeed = 45, pa
 
 const TYPEWRITER_WORDS = [
   "seeking new adventures",
-  "curious!",
+  "looking to learn!",
   "a coffee addict",
   "a fan of Jazz",
   "always open for a chat",
   "likely at the parkour gym",
   "also a bad tennis player",
-  "looking for free climbing gym guest passes",
+  "down to climb",
   "figuring it out",
   "",
 ];
@@ -98,6 +98,17 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
 
           <hr className="mb-10 border-white/8 md:mb-14" />
 
+          {/* Intro */}
+          <section className="mb-10 md:mb-14">
+            <div className="max-w-prose space-y-4 text-base font-light leading-relaxed text-white/65">
+              <p>I'm a builder who works at the intersection of product, data, and human connection. My background spans product management, research, and engineering, but the bottom-line is the same: understanding how people actually behave before deciding what to build.</p>
+              <p>I'm especially interested in how data and storytelling work together — using what people do, not just what they say, to shape something that genuinely helps them. Through roles in product, research, and education, I've worked on problems involving growth, trust, and usability, always considering how something is experienced</p>
+              <p>With training across data analysis, engineering, and direct user research, I bring a grounded, people-first lens to technical work. I'm currently seeking opportunities where I can combine that curiosity with building — places where understanding people and shipping good products aren't separate jobs.</p>
+            </div>
+          </section>
+
+          <hr className="mb-10 border-white/8 md:mb-14" />
+
           {/* Values */}
           <section className="mb-10 md:mb-14">
             <p className="mb-6 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Values</p>
@@ -106,17 +117,17 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
                 {
                   n: "01",
                   title: "Candor",
-                  body: "Ed Catmull wrote about this in Creativity Inc — a candid environment lets people express more, generate better ideas, and genuinely enjoy each other's company. In every setting I've been in, how willing people were to be candid with one another always determined how successful and enjoyable working together actually was. I try to create spaces where people feel safe to speak their mind, share mistakes, and say the hard things.",
+                  body: "I try to talk to people the way I'd talk to a friend, and to withhold judgment long enough to actually hear them. When I disagree, I'd rather ask how someone got there than tell them why they're wrong. I'm curious how people see the world, not just what they think about it.",
                 },
                 {
                   n: "02",
                   title: "Curiosity",
-                  body: "I love picking up new skills, going to new places, and hearing about other people's experiences. I want to experience as much as possible while I'm here — both the bad and the good. Understanding the worlds we live in and the worlds we build is something I find endlessly fascinating.",
+                  body: "I like asking why and how because I find it fascinating to learn how people see things. Whether it's someone explaining their field or describing why they made a decision, I find that the best conversations happen when you let someone go deep on what they actually care about.",
                 },
                 {
                   n: "03",
                   title: "Humility",
-                  body: "I try to be humble in my approach to life and work. I try to be open to learning from others and to be willing to admit when I'm wrong. I try to be willing to listen to others and to be willing to learn from them.",
+                  body: "I've been wrong enough times to know that being right is less useful than being open. I'd rather ask the question and take it a little slow than assume and miss something important.",
                 },
               ].map(({ n, title, body }) => (
                 <div key={n} className="flex gap-6 md:gap-10">

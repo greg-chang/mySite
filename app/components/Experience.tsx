@@ -74,9 +74,12 @@ export function Experience() {
                 onClick={() => setActiveExperienceId(isActive ? null : exp.id)}
                 aria-expanded={isActive}
               >
-                <h2 className="mb-5 text-3xl font-light text-white/90 transition-transform duration-300 group-hover:translate-x-2 md:text-4xl lg:text-5xl">
+                <h2 className="mb-1.5 text-3xl font-light text-white/90 transition-transform duration-300 group-hover:translate-x-2 md:text-4xl lg:text-5xl">
                   {exp.title}
                 </h2>
+                <p className="mb-4 text-sm font-normal tracking-wide text-white/35 transition-transform duration-300 group-hover:translate-x-2">
+                  {exp.organization}
+                </p>
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between md:gap-8">
                   <p className="min-w-0 flex-1 text-base font-light text-white/70 transition-transform duration-300 group-hover:translate-x-2 md:text-lg">
                     {exp.description}
@@ -88,20 +91,42 @@ export function Experience() {
               </button>
 
               {isActive && exp.details && (
-                <div className="mt-5 max-w-2xl rounded-lg border border-white/15 bg-white/6 p-4 text-sm font-light text-white/75 md:ml-6 md:text-base">
-                  <ul className="space-y-2">
-                    {exp.details.map((detail) => (
-                      <li key={detail} className="leading-relaxed">
-                        {detail}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="mt-5 max-w-2xl space-y-5 md:ml-6">
+                  {(["context", "approach", "signal"] as const).map((key) => (
+                    <div key={key}>
+                      <p className="mb-1.5 text-xs font-normal uppercase tracking-[0.25em] text-white/30">
+                        {key}
+                      </p>
+                      <div className="space-y-3">
+                        {exp.details![key].split("\n\n").map((para, i) => (
+                          <p key={i} className="text-sm font-light leading-relaxed text-white/65 md:text-base">
+                            {para}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div>
+                    <p className="mb-2 text-xs font-normal uppercase tracking-[0.25em] text-white/30">
+                      Execution
+                    </p>
+                    <ul className="space-y-1.5">
+                      {exp.details.execution.map((item) => (
+                        <li key={item} className="flex gap-3 text-sm font-light leading-relaxed text-white/65 md:text-base">
+                          <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-white/25" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
                   {exp.url && (
                     <a
                       href={exp.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-4 inline-block text-sm text-white/90 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white"
+                      className="inline-block text-sm text-white/90 underline decoration-white/30 underline-offset-4 transition-colors hover:text-white"
                     >
                       Visit site
                     </a>
