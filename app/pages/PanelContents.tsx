@@ -104,7 +104,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
           <section className="mb-10 md:mb-14">
             <div className="max-w-prose space-y-4 text-base font-light leading-relaxed text-white/65">
               <p>I'm a builder who works at the intersection of product, data, and human connection. My background spans product management, research, and engineering, but the bottom-line is the same: understanding how people actually behave before deciding what to build.</p>
-              <p>I'm especially interested in how data and storytelling work together — using what people do, not just what they say, to shape something that genuinely helps them. Through roles in product, research, and education, I've worked on problems involving growth, trust, and usability, always considering how something is experienced</p>
+              <p>I'm especially interested in how data and storytelling work together — using what people do, not just what they say, to shape something that genuinely helps them. Through roles in product, research, and education, I've worked on problems involving growth, trust, and usability, always considering how something is.</p>
               <p>With training across data analysis, engineering, and direct user research, I bring a grounded, people-first lens to technical work. I'm currently seeking opportunities where I can combine that curiosity with building — places where understanding people and shipping good products aren't separate jobs.</p>
             </div>
           </section>
@@ -137,6 +137,43 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
                   <div>
                     <p className="mb-2 text-lg text-white">{title}</p>
                     <p className="max-w-prose text-base leading-relaxed text-white/55">{body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <hr className="mb-10 border-white/8 md:mb-14" />
+
+          {/* Skills */}
+          <section className="mb-10 md:mb-14">
+            <p className="mb-6 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Skills</p>
+            <div className="space-y-5">
+              {[
+                {
+                  label: "Languages",
+                  items: ["Python", "JavaScript / TypeScript", "SQL", "R", "C / C++", "Go", "HTML / CSS"],
+                },
+                {
+                  label: "Frameworks",
+                  items: ["React", "React Native", "Next.js", "NestJS", "Node.js", "Express", "Svelte", "Tailwind", "FastAPI", "Flask", "LangChain", "Gin", "Gorm"],
+                },
+                {
+                  label: "Tools",
+                  items: ["Git", "Figma", "Postman", "Photoshop", "Notion", "Docker", "Pytest", "Vitest", "ESLint", "Supabase", "PostHog", "Cloudflare"],
+                },
+              ].map(({ label, items }) => (
+                <div key={label}>
+                  <p className="mb-2.5 text-xs font-normal uppercase tracking-[0.25em] text-white/30">{label}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {items.map((item) => (
+                      <span
+                        key={item}
+                        className="rounded-full border border-white/10 px-3 py-1 text-sm font-light text-white/60"
+                      >
+                        {item}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}

@@ -65,26 +65,25 @@ export const experiences: ExperienceEntry[] = [
   },
   {
     id: "2",
-    title: "Product Manager",
+    title: "Product Manager → Software Engineer",
     organization: "Moober · Davis, CA",
     description:
       "Managed product development for UC Davis student exclusive ride-sharing website for 1100+ users",
-    period: "Oct '24 – Jul '25",
+    period: "Oct '24 – Sep '25",
     image: "/experiences/aggieworks.png",
     url: "https://aggieworks.org/products/moober",
     details: {
       context:
-        "When I joined, Moober was early. The primary problem was GTM and getting enough students to know the product existed. But I also knew that scaling without fixing underlying product gaps would churn just as fast as it came in. This meant managing two paths simultaneously: visible marketing work and quieter behind-the-scenes fixes to make the product ready and polished.",
+        "I joined as PM when Moober was early — the main problem was GTM, getting enough students to know it existed, while making sure the product itself wouldn't churn the users we did bring in.",
       approach:
-        "I used SQL queries in Supabase to find behavioral patterns — when drivers posted, where they dropped off, what correlated with retention — and built targeted Python email blasts for user interviews timed to those windows along with pushing for more awareness. The user interviews informed me of three product issues worth fixing before scaling further: too much friction in the posting flow, no real incentive to return, and privacy concerns with phone numbers being exposed. I consulted a cybersecurity researcher at Davis to better understand the risks and gated the contact system limiting private information visibility",
+        "I used SQL in Supabase to find when drivers actually posted (mostly right before breaks) and built outreach around that pattern instead of generic marketing. User interviews also surfaced a phone number privacy risk, which I took seriously enough to consult a cybersecurity researcher at Davis before designing a fix, keeping the platform student-only to protect the trust the product depended on.",
       execution: [
-        "Ran 40+ user interviews and a targeted feedback campaign to diagnose driver pain points",
-        "Built automated Python outreach timed to high-demand academic calendar windows",
-        "Shipped a privacy-gated contact system limiting number visibility to confirmed ride participants",
-        "Shipped improvements across posting flows, notifications, security, and ride request flows",
+        "Ran 40+ user interviews and built automated, calendar-timed outreach with Python",
+        "Shipped a privacy-gated contact system and improvements across communication preferences, notifications, and ride flows",
+        "Led a cross-functional team of engineers, designers, and marketing",
       ],
       signal:
-        "Driver postings up 45%, NPS +16%, scaled from 200 to 1,100+ users.",
+        "Driver postings up 45%, NPS +16%, scaled to 1,100+ users. A year later, I came back briefly to help the engineering team rebuild the backend for a new React Native app — built JWT auth in NestJS and migrated hosting off Vercel to a VPS, cutting costs 90%. It was a good way to stay close to technical work, and a strange kind of full-circle: I'd made the product calls as PM, then helped live inside their technical consequences as an engineer.",
     },
   },
   {
@@ -107,7 +106,7 @@ export const experiences: ExperienceEntry[] = [
         "Diagnosed a CrossRef API documentation change and a DataSci server package conflict that blocked remote execution",
       ],
       signal:
-        "We recovered about 80% of every category before time ran out — solid, but incomplete. The corpus got used, then the program's funding was paused and the work went dormant.",
+        "We recovered about 80% of every category before time ran out — solid, but incomplete. The program's funding was later paused, but the corpus was kept.",
     },
   },
   {
@@ -136,7 +135,7 @@ export const experiences: ExperienceEntry[] = [
   {
     id: "5",
     title: "Software Engineer",
-    organization: "CodeLab Davis · Davis, CA",
+    organization: "CodeLab · Davis, CA",
     description:
       "Developed flashcard website that integrated spaced repetition to improve learning efficiency",
     period: "Oct '23 – Jun '24",
@@ -170,7 +169,7 @@ export const experiences: ExperienceEntry[] = [
       context:
         "TOKI needed UI improvements on their site, and separately, their travel employees wanted a faster way to ideate itinerary ideas for clients rather than starting from scratch each time.",
       approach:
-        "The UI work was straightforward iteration on their existing Rails frontend. The more interesting problem was the chatbot — I prototyped it with Flask and LangChain on top of OpenAI's API while it was still early and the tooling around it was thin, aiming to provide employees a starting point to base on improving their workflow.",
+        "The UI work was straightforward iteration on their existing frontend. The more interesting problem was the chatbot — I prototyped it with Flask and LangChain on top of OpenAI's API while it was still early and the tooling around it was thin, aiming to provide employees a starting point to base on improving their workflow.",
       execution: [
         "Shipped UI improvements on TOKI's  website",
         "Prototyped an internal chatbot using Flask, LangChain, and early OpenAI API access to help employees ideate travel itineraries",
