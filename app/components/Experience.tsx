@@ -13,11 +13,13 @@ const scrollTargetClassName =
 export function Experience() {
   const [activeExperienceId, setActiveExperienceId] = useState<string | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const titleRefs = useRef<Record<string, HTMLHeadingElement | null>>({});
 
   useLayoutEffect(() => {
     if (!activeExperienceId) return;
     const el = sectionRefs.current[activeExperienceId];
-    if (!el) return;
+    const titleEl = titleRefs.current[activeExperienceId];
+    if (!el || !titleEl) return;
 
     let scrollParent: HTMLElement | null = el.parentElement;
     while (scrollParent) {
@@ -30,13 +32,13 @@ export function Experience() {
     let controls: { stop: () => void } | undefined;
     const frame = requestAnimationFrame(() => {
       const containerRect = scrollParent!.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
+      const titleRect = titleEl.getBoundingClientRect();
+      const scrollMarginTop = parseFloat(window.getComputedStyle(el).scrollMarginTop) || 0;
       const target =
         scrollParent!.scrollTop +
-        elRect.top -
+        titleRect.top -
         containerRect.top -
-        containerRect.height / 2 +
-        elRect.height / 2;
+        scrollMarginTop;
 
       controls = animate(scrollParent!.scrollTop, Math.max(0, target), {
         type: "spring",
@@ -74,7 +76,12 @@ export function Experience() {
                 onClick={() => setActiveExperienceId(isActive ? null : exp.id)}
                 aria-expanded={isActive}
               >
-                <h2 className="mb-1.5 text-3xl font-light text-white/90 transition-transform duration-300 group-hover:translate-x-2 md:text-4xl lg:text-5xl">
+                <h2
+                  ref={(node) => {
+                    titleRefs.current[exp.id] = node;
+                  }}
+                  className="mb-1.5 text-3xl font-light text-white/90 transition-transform duration-300 group-hover:translate-x-2 md:text-4xl lg:text-5xl"
+                >
                   {exp.title}
                 </h2>
                 <p className="mb-4 text-sm font-normal tracking-wide text-white/35 transition-transform duration-300 group-hover:translate-x-2">

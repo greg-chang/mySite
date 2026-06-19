@@ -103,7 +103,7 @@ export const experiences: ExperienceEntry[] = [
         "I worked on a 3-person team building an RSelenium web crawler against the library system, since standard scraping didn't work on that site. I focused on the crawler mechanics and diagnosing what broke — page-load timing, pagination, ISSN parsing — while teammates handled data frame structuring and coordination. We ran into real infrastructure friction: CrossRef's API had changed since the original code was written, and the DataSci server didn't support a package the crawler depended on, so we ran it locally instead.",
       execution: [
         "Worked on the RSelenium crawler logic and diagnosed page-load, pagination, and crash issues across 14 journal categories",
-        "Helped recover ~20,000 journals and associated metadata (titles, volumes, issues, DOIs, ISSNs)",
+        "Helped recover ~4,000 literary works with associated metadata (titles, volumes, issues, DOIs, ISSNs)",
         "Diagnosed a CrossRef API documentation change and a DataSci server package conflict that blocked remote execution",
       ],
       signal:

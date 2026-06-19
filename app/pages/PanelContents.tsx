@@ -67,7 +67,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
   ];
 
   const hobbies = [
-    "Parkour / Freerunning / Tricking",
+    "Parkour / Tricking",
     "Trampolining",
     "Skateboarding",
     "Climbing",
@@ -164,7 +164,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
           <hr className="mb-10 border-white/8 md:mb-14" />
 
           {/* Hobbies */}
-          <section>
+          <section className="pb-8 md:pb-10">
             <p className="mb-4 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Hobbies</p>
             <p className="text-base leading-loose text-white/55">
               {hobbies.join(" · ")}
@@ -252,7 +252,7 @@ export function WorksContent() {
   return (
     <div className="relative flex flex-1 w-full flex-col overflow-hidden font-sans font-light min-h-0">
       <PanelHeader title="Works" />
-      <div className="flex flex-1 overflow-x-hidden overflow-y-auto overscroll-none min-h-0 px-6 pt-36 md:px-10 md:pt-44" style={{ paddingBottom: "calc(6rem + env(safe-area-inset-bottom))" }}>
+      <div className="flex flex-1 overflow-x-hidden overflow-y-auto overscroll-none min-h-0 px-6 pt-40 md:px-10 md:pt-48" style={{ paddingBottom: "calc(6rem + env(safe-area-inset-bottom))" }}>
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 md:gap-14 lg:gap-16">
           {projects.map((project, index) => {
             const imageLeft = index % 2 === 0;
