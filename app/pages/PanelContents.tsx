@@ -66,6 +66,12 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
     { title: "On Earth We're Briefly Gorgeous", author: "Ocean Vuong" },
   ];
 
+  const skillGroups = [
+    { label: "Languages", items: ["Python", "JavaScript / TypeScript", "SQL", "R", "C / C++", "Go", "HTML / CSS"] },
+    { label: "Frameworks", items: ["React", "React Native", "Next.js", "NestJS", "Node.js", "Express", "Svelte", "Tailwind", "FastAPI", "Flask", "LangChain", "Gin", "Gorm"] },
+    { label: "Tools", items: ["Git", "Figma", "Postman", "Photoshop", "Notion", "Docker", "Pytest", "Vitest", "ESLint", "Supabase", "PostHog", "Cloudflare"] },
+  ];
+
   const hobbies = [
     "Parkour / Tricking",
     "Trampolining",
@@ -78,12 +84,32 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
     "Digital Art",
   ];
 
+  const skillsSection = (
+    <section className="mb-10 md:mb-0">
+      <p className="mb-6 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Skills</p>
+      <div className="space-y-5">
+        {skillGroups.map(({ label, items }) => (
+          <div key={label}>
+            <p className="mb-2.5 text-xs font-normal uppercase tracking-[0.25em] text-white/30">{label}</p>
+            <div className="flex flex-wrap gap-2">
+              {items.map((item) => (
+                <span key={item} className="rounded-full border border-white/10 px-3 py-1 text-sm font-light text-white/60">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden font-sans font-light min-h-0">
 
       <PanelHeader title="About" />
 
-      {/* Body: content left, image right — scroll together under header */}
+      {/* Body: content left, image right */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto overscroll-none min-h-0 md:flex">
 
         {/* Left: content */}
@@ -149,28 +175,12 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
           <section className="mb-10 md:mb-14">
             <p className="mb-6 text-sm font-normal uppercase tracking-[0.35em] text-white/45">Skills</p>
             <div className="space-y-5">
-              {[
-                {
-                  label: "Languages",
-                  items: ["Python", "JavaScript / TypeScript", "SQL", "R", "C / C++", "Go", "HTML / CSS"],
-                },
-                {
-                  label: "Frameworks",
-                  items: ["React", "React Native", "Next.js", "NestJS", "Node.js", "Express", "Svelte", "Tailwind", "FastAPI", "Flask", "LangChain", "Gin", "Gorm"],
-                },
-                {
-                  label: "Tools",
-                  items: ["Git", "Figma", "Postman", "Photoshop", "Notion", "Docker", "Pytest", "Vitest", "ESLint", "Supabase", "PostHog", "Cloudflare"],
-                },
-              ].map(({ label, items }) => (
+              {skillGroups.map(({ label, items }) => (
                 <div key={label}>
                   <p className="mb-2.5 text-xs font-normal uppercase tracking-[0.25em] text-white/30">{label}</p>
                   <div className="flex flex-wrap gap-2">
                     {items.map((item) => (
-                      <span
-                        key={item}
-                        className="rounded-full border border-white/10 px-3 py-1 text-sm font-light text-white/60"
-                      >
+                      <span key={item} className="rounded-full border border-white/10 px-3 py-1 text-sm font-light text-white/60">
                         {item}
                       </span>
                     ))}
@@ -207,9 +217,10 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
               {hobbies.join(" · ")}
             </p>
           </section>
+
         </div>
 
-        {/* Right: image scrolls with content */}
+        {/* Right: image */}
         <div className="hidden w-[35%] shrink-0 pt-28 md:block md:pt-44 lg:pt-52">
           <img
             src="/Pictures/GregWave.png"
@@ -218,6 +229,7 @@ export function AboutContent({ isActive }: { isActive: boolean }) {
             className="pointer-events-none w-full select-none object-cover brightness-75 contrast-110 [clip-path:inset(0_0_0%_0)]"
           />
         </div>
+
       </div>
     </div>
   );
@@ -256,7 +268,7 @@ export function ContactContent() {
             changjgreg@gmail.com
           </a>
           <a
-            href="https://www.linkedin.com/in/gregjchang"
+            href="https://www.linkedin.com/in/gregjchang/"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 transition-colors hover:text-white"

@@ -32,7 +32,7 @@ const LANDSCAPE_EXPLOSION_FILL = { width: 0.9, height: 0.65 };
 const PORTRAIT_EXPLOSION_FILL = { width: 0.78, height: 0.88 };
 
 const MENU_LINES_DESKTOP = [
-  "Greg's site",
+  "Greg's Site",
   "",
   "v About",
   "",
@@ -44,7 +44,7 @@ const MENU_LINES_DESKTOP = [
 ];
 
 const MENU_LINES_TOUCH = [
-  "Greg's site",
+  "Greg's Site",
   "",
   "",
   "v About",
@@ -519,7 +519,7 @@ export default function DonutAnimation({ onMenuReady }: { onMenuReady?: () => vo
 
       {showIntroCta && (
         <p className="absolute left-1/2 top-[75%] -translate-x-1/2 pointer-events-none font-mono text-xs sm:text-sm text-zinc-500 whitespace-nowrap text-center px-4">
-          You put everything on the bagel ...
+          Greg&apos;s Site
           <br />
           Click to proceed!
         </p>
